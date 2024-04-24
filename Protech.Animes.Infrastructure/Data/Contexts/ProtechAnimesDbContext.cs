@@ -18,6 +18,18 @@ public class ProtechAnimesDbContext : DbContext
             .HasOne(a => a.Director)
             .WithMany(d => d.Animes)
             .HasForeignKey(a => a.DirectorId);
+
+        modelBuilder.Entity<Anime>()
+            .HasIndex(a => a.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<Director>()
+            .HasIndex(d => d.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
