@@ -1,9 +1,13 @@
 namespace Protech.Animes.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Protech.Animes.Infrastructure.Entities;
+using Protech.Animes.Domain.Entities;
 
 public class ProtechAnimesDbContext : DbContext
 {
+
+    public ProtechAnimesDbContext() { }
+
+    public ProtechAnimesDbContext(DbContextOptions<ProtechAnimesDbContext> options) : base(options) { }
 
     public DbSet<Anime> Animes { get; set; }
     public DbSet<Director> Directors { get; set; }
