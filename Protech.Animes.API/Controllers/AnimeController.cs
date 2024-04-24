@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Application.UseCases;
+using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
 [ApiController]
@@ -10,9 +11,11 @@ public class AnimeController : ControllerBase
 {
     private readonly IAnimeService _animeService;
     private readonly CreateAnimeUseCase _createAnimeUseCase;
+    private readonly ILogger<AnimeController> _logger;
 
-    public AnimeController(IAnimeService animeService, CreateAnimeUseCase createAnimeUseCase)
+    public AnimeController(IAnimeService animeService, CreateAnimeUseCase createAnimeUseCase, ILogger<AnimeController> logger)
     {
+        _logger = logger;
         _animeService = animeService;
         _createAnimeUseCase = createAnimeUseCase;
     }
@@ -22,6 +25,9 @@ public class AnimeController : ControllerBase
     public async Task<IActionResult> GetAnimes()
     {
         var animes = await _animeService.GetAnimes();
+
+        _logger.LogInformation("GetAnimes called");
+
         return Ok(animes);
     }
 
@@ -30,8 +36,20 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetAnime(int id)
     {
-        var anime = await _animeService.GetAnime(id);
-        return Ok(anime);
+        try
+        {
+            var anime = await _animeService.GetAnime(id);
+
+            _logger.LogInformation($"GetAnime called with id {id}");
+
+            return Ok(anime);
+        }
+        catch (NotFoundException)
+        {
+            _logger.LogWarning($"Anime with id {id} not found");
+
+            return NotFound();
+        }
     }
 
     [HttpPost]
@@ -40,6 +58,8 @@ public class AnimeController : ControllerBase
     public async Task<IActionResult> CreateAnime(CreateAnimeDto animeDto)
     {
         var anime = await _createAnimeUseCase.Execute(animeDto);
+
+        _logger.LogInformation("CreateAnime called");
 
         return CreatedAtAction(nameof(CreateAnime), new { id = anime.Id }, anime);
     }
@@ -50,7 +70,18 @@ public class AnimeController : ControllerBase
     public async Task<IActionResult> DeleteAnime(int id)
     {
         var deleted = await _animeService.DeleteAnime(id);
-        if (deleted) return NoContent();
+
+        _logger.LogInformation($"DeleteAnime called with id {id}");
+
+        if (deleted)
+        {
+            _logger.LogInformation($"Anime with id {id} deleted");
+
+            return NoContent();
+        }
+
+        _logger.LogWarning($"Anime with id {id} could not be deleted");
+
         return NotFound();
     }
 
@@ -59,6 +90,9 @@ public class AnimeController : ControllerBase
     public async Task<IActionResult> GetAnimesByDirector(int directorId)
     {
         var animes = await _animeService.GetAnimesByDirector(directorId);
+
+        _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
+
         return Ok(animes);
     }
 }
