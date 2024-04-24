@@ -60,7 +60,7 @@ public class AnimeRepository : IAnimeRepository
     {
         return await _dbContext.Animes
             .Include(a => a.Director)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .SingleOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<Anime?> UpdateAsync(int id, Anime entity)
@@ -88,17 +88,12 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<IEnumerable<Anime>> GetByDirectorIdAsync(int directorId)
     {
-        return await _dbContext.Animes
-            .AsNoTracking()
-            .Where(a => a.DirectorId == directorId)
-            .ToListAsync();
+        return await GetByDirectorIdQuery(directorId).ToListAsync();
     }
 
     public async Task<IEnumerable<Anime>> GetByDirectorIdPaginatedAsync(int directorId, int page, int pageSize)
     {
-        return await _dbContext.Animes
-            .AsNoTracking()
-            .Where(a => a.DirectorId == directorId)
+        return await GetByDirectorIdQuery(directorId)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -120,5 +115,13 @@ public class AnimeRepository : IAnimeRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+    }
+
+    private IQueryable<Anime> GetByDirectorIdQuery(int directorId)
+    {
+        return _dbContext.Animes
+            .AsNoTracking()
+            .Where(a => a.DirectorId == directorId)
+            .Include(a => a.Director);
     }
 }
