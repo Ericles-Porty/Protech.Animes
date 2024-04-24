@@ -1,4 +1,14 @@
+using Protech.Animes.Infrastructure.Data.Contexts;
+using Microsoft.EntityFrameworkCore;
+using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
+using Protech.Animes.Infrastructure.Data.Repositories;
+using Protech.Animes.Application.Interfaces;
+using Protech.Animes.Application.Services;
+using Protech.Animes.Application.UseCases;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("ProtechAnimeDbConnection");
 
 // Add services to the container.
 builder.Services.AddDbContext<ProtechAnimesDbContext>(options => options.UseNpgsql(connectionString));
@@ -7,7 +17,19 @@ builder.Services.AddDbContext<ProtechAnimesDbContext>(options => options.UseNpgs
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Repositories
+builder.Services.AddScoped<IAnimeRepository, AnimeRepository>();
+builder.Services.AddScoped<IDirectorRepository, DirectorRepository>();
+
+// Services
+builder.Services.AddScoped<IAnimeService, AnimeService>();
+builder.Services.AddScoped<IDirectorService, DirectorService>();
+
+// Use cases
+builder.Services.AddScoped<CreateAnimeUseCase>();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
