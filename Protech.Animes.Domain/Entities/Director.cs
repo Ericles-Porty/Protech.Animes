@@ -1,4 +1,4 @@
-namespace Protech.Animes.Infrastructure.Entities;
+namespace Protech.Animes.Domain.Entities;
 public class Director
 {
     public int Id { get; set; }
