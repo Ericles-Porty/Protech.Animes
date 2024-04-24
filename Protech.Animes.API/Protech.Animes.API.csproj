@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Protech.Animes.Infrastructure\Protech.Animes.Infrastructure.csproj" />
+    <ProjectReference Include="..\Protech.Animes.Application\Protech.Animes.Application.csproj" />
   </ItemGroup>
 
 </Project>
