@@ -1,6 +1,38 @@
-@Protech.Animes.API_HostAddress = http://localhost:5088
+@Protech_Animes_API_HostAddress = http://localhost:5088
 
-GET {{Protech.Animes.API_HostAddress}}/weatherforecast/
+GET {{Protech_Animes_API_HostAddress}}/api/anime
 Accept: application/json
 
 ###
+
+GET {{Protech_Animes_API_HostAddress}}/api/anime/1
+Accept: application/json
+
+###
+
+POST {{Protech_Animes_API_HostAddress}}/api/anime
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Naruto",
+  "summary": "Naruto is a Japanese manga series written and illustrated by Masashi Kishimoto. It tells the story of Naruto Uzumaki, a young ninja who seeks recognition from his peers and dreams of becoming the Hokage, the leader of his village.",
+  "directorName": "Masashi Kishimoto"
+}
+
+###
+
+PUT {{Protech_Animes_API_HostAddress}}/api/anime/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Naruto Shippuden",
+  "summary": "Naruto is a Japanese manga series written and illustrated by Masashi Kishimoto. It tells the story of Naruto Uzumaki, a young ninja who seeks recognition from his peers and dreams of becoming the Hokage, the leader of his village.",
+  "directorName": "Masashi Kishimoto",
+}
+
+###
+
+DELETE {{Protech_Animes_API_HostAddress}}/api/anime/1
+Accept: application/json
