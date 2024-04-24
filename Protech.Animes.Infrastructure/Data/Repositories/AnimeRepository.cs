@@ -124,4 +124,22 @@ public class AnimeRepository : IAnimeRepository
             .Where(a => a.DirectorId == directorId)
             .Include(a => a.Director);
     }
+
+    public async Task<IEnumerable<Anime>> GetByNameAsync(string name)
+    {
+        return await _dbContext.Animes
+            .AsNoTracking()
+            .Where(a => a.Name.Contains(name))
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Anime>> GetByNamePaginatedAsync(string name, int page, int pageSize)
+    {
+        return await _dbContext.Animes
+            .AsNoTracking()
+            .Where(a => a.Name.Contains(name))
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }
