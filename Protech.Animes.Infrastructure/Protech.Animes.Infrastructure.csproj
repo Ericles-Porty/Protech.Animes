@@ -22,8 +22,11 @@
   <ItemGroup>
     <Folder Include="Data\Contexts\" />
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Data\Configurations\" />
-    <Folder Include="Entities\" />
+    <Folder Include="Data\Configurations\" />  
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Protech.Animes.Domain\Protech.Animes.Domain.csproj" />
   </ItemGroup>
 
 </Project>
