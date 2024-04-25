@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Protech.Animes.Domain.Entities;
 
 public class User
 {
-    public int Id { get; set; }
+    [Key]
+    public Guid Id { get; set; }
 
     public required string Name { get; set; }
 
@@ -10,6 +13,6 @@ public class User
 
     public required string Password { get; set; }
 
-    public required string Role { get; set; }
+    public string? Role { get; set; }
 
 }

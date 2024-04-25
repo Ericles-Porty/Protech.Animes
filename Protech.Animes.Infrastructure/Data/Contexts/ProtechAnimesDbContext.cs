@@ -33,6 +33,14 @@ public class ProtechAnimesDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Role)
+            .HasDefaultValue("User");
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Id);
+
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
