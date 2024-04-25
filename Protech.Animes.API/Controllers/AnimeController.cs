@@ -24,11 +24,20 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     public async Task<IActionResult> GetAnimes()
     {
-        var animes = await _animeService.GetAnimes();
+        try
+        {
+            _logger.LogInformation("GetAnimes called");
 
-        _logger.LogInformation("GetAnimes called");
+            var animes = await _animeService.GetAnimes();
 
-        return Ok(animes);
+            return Ok(animes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes");
+
+            return StatusCode(500);
+        }
     }
 
     [HttpGet("{id}")]
@@ -38,9 +47,11 @@ public class AnimeController : ControllerBase
     {
         try
         {
+            _logger.LogInformation($"GetAnime called with id {id}");
+
             var anime = await _animeService.GetAnime(id);
 
-            _logger.LogInformation($"GetAnime called with id {id}");
+            _logger.LogInformation($"Anime with id {id} found");
 
             return Ok(anime);
         }
@@ -57,11 +68,22 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> CreateAnime(CreateAnimeDto animeDto)
     {
-        var anime = await _createAnimeUseCase.Execute(animeDto);
+        try
+        {
+            _logger.LogInformation("CreateAnime called");
 
-        _logger.LogInformation("CreateAnime called");
+            var anime = await _createAnimeUseCase.Execute(animeDto);
 
-        return CreatedAtAction(nameof(CreateAnime), new { id = anime.Id }, anime);
+            _logger.LogInformation("Anime created");
+
+            return CreatedAtAction(nameof(CreateAnime), new { id = anime.Id }, anime);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while creating the anime");
+
+            return StatusCode(500);
+        }
     }
 
     [HttpDelete("{id}")]
@@ -69,30 +91,49 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteAnime(int id)
     {
-        var deleted = await _animeService.DeleteAnime(id);
-
-        _logger.LogInformation($"DeleteAnime called with id {id}");
-
-        if (deleted)
+        try
         {
-            _logger.LogInformation($"Anime with id {id} deleted");
 
-            return NoContent();
+            var deleted = await _animeService.DeleteAnime(id);
+
+            _logger.LogInformation($"DeleteAnime called with id {id}");
+
+            if (deleted)
+            {
+                _logger.LogInformation($"Anime with id {id} deleted");
+
+                return NoContent();
+            }
+
+            _logger.LogWarning($"Anime with id {id} could not be deleted");
+
+            return NotFound();
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while deleting the anime");
 
-        _logger.LogWarning($"Anime with id {id} could not be deleted");
-
-        return NotFound();
+            return StatusCode(500);
+        }
     }
 
     [HttpGet("director/{directorId}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     public async Task<IActionResult> GetAnimesByDirector(int directorId)
     {
-        var animes = await _animeService.GetAnimesByDirector(directorId);
+        try
+        {
+            _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
 
-        _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
+            var animes = await _animeService.GetAnimesByDirector(directorId);
 
-        return Ok(animes);
+            return Ok(animes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by director");
+
+            return StatusCode(500);
+        }
     }
 }
