@@ -10,5 +10,6 @@ public class DirectorProfile : Profile
     {
         CreateMap<Director, DirectorDto>()
             .ReverseMap();
+
     }
 }

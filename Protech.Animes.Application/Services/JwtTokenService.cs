@@ -30,6 +30,8 @@ public class JwtTokenService : IJwtTokenService
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role)
                 }),
+            Audience = _jwtConfig.Audience,
+            Issuer = _jwtConfig.Issuer,
             Expires = DateTime.UtcNow.AddHours(_jwtConfig.DurationInHours),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };

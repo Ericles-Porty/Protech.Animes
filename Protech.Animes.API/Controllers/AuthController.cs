@@ -34,8 +34,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), 200)]
     public async Task<IActionResult> Login(LoginUserDto loginUserDto)
     {
-        var token = await _loginUserUseCase.Execute(loginUserDto.Email, loginUserDto.Password);
+        var userWithToken = await _loginUserUseCase.Execute(loginUserDto.Email, loginUserDto.Password);
 
-        return Ok(new { token });
+        return Ok(userWithToken);
     }
 }
