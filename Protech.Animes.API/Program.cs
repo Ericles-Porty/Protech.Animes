@@ -1,10 +1,9 @@
 using Protech.Animes.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
-using Protech.Animes.Infrastructure.Data.Repositories;
-using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Application.Services;
-using Protech.Animes.Application.UseCases;
+using Microsoft.OpenApi.Models;
+using Protech.Animes.API.Extensions.DependencyInjection;
+using Protech.Animes.API.Extensions.Auth.JWT;
+using Protech.Animes.Application.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,20 +17,40 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
 
-// Repositories
-builder.Services.AddScoped<IAnimeRepository, AnimeRepository>();
-builder.Services.AddScoped<IDirectorRepository, DirectorRepository>();
+RepositoryDependenciesInjectionExtension.AddRepositoryDependencies(builder.Services);
 
-// Services
-builder.Services.AddScoped<IAnimeService, AnimeService>();
-builder.Services.AddScoped<IDirectorService, DirectorService>();
+ServicesDependenciesInjectionExtension.AddServicesDependencies(builder.Services);
 
-// Use cases
-builder.Services.AddScoped<CreateAnimeUseCase>();
+UseCasesDependenciesInjectionExtension.AddUseCases(builder.Services);
 
+JwtConfigDependenciesInjectionExtension.AddJwtConfigDependencies(builder.Services, builder.Configuration);
+
+JwtExtensions.AddJwt(builder.Services, builder.Configuration);
+
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "Protech.Animes.API",
+        Version = "v1",
+    });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization : Bearer { token }\"",
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+});
+
 
 var app = builder.Build();
 
@@ -44,6 +63,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
