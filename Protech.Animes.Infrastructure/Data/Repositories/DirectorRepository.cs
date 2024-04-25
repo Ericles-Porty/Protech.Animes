@@ -5,7 +5,6 @@ using Protech.Animes.Domain.Entities;
 
 namespace Protech.Animes.Infrastructure.Data.Repositories;
 
-
 public class DirectorRepository : IDirectorRepository
 {
 
