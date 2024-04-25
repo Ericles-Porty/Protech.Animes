@@ -5,6 +5,8 @@ using Protech.Animes.Domain.Entities;
 public interface IAnimeRepository : IBaseRepository<Anime>
 {
     public Task<Anime?> GetByIdIncludingDirectorAsync(int id);
+    public Task<IEnumerable<Anime>> GetByNameAsync(string name);
+    public Task<IEnumerable<Anime>> GetByNamePaginatedAsync(string name, int page, int pageSize);
     public Task<IEnumerable<Anime>> GetAllPaginatedAsync(int page, int pageSize);
     public Task<IEnumerable<Anime>> GetByDirectorIdAsync(int directorId);
     public Task<IEnumerable<Anime>> GetByDirectorIdPaginatedAsync(int directorId, int page, int pageSize);

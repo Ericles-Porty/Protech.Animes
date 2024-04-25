@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
+using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class DirectorController : ControllerBase
@@ -19,13 +22,23 @@ public class DirectorController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
+    [Authorize]
     public async Task<IActionResult> GetDirectors()
     {
-        var directors = await _directorService.GetDirectors();
+        try
+        {
+            _logger.LogInformation("GetDirectors called");
 
-        _logger.LogInformation("GetDirectors called");
+            var directors = await _directorService.GetDirectors();
 
-        return Ok(directors);
+            return Ok(directors);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the directors");
+
+            return StatusCode(500);
+        }
     }
 
     [HttpGet("{id}")]
@@ -33,18 +46,28 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetDirector(int id)
     {
-        var director = await _directorService.GetDirector(id);
-
-        _logger.LogInformation($"GetDirector called with id {id}");
-
-        if (director == null)
+        try
         {
-            _logger.LogWarning($"Director with id {id} not found");
+            _logger.LogInformation($"GetDirector called with id {id}");
+
+            var director = await _directorService.GetDirector(id);
+
+            _logger.LogInformation($"Director with id {id} found");
+
+            return Ok(director);
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Director not found");
 
             return NotFound();
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the director");
 
-        return Ok(director);
+            return StatusCode(500);
+        }
     }
 
     [HttpPost]
@@ -52,11 +75,20 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> CreateDirector(DirectorDto directorDto)
     {
-        var director = await _directorService.CreateDirector(directorDto);
+        try
+        {
+            _logger.LogInformation("CreateDirector called");
 
-        _logger.LogInformation("CreateDirector called");
+            var director = await _directorService.CreateDirector(directorDto);
 
-        return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
+            return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while creating the director");
+
+            return BadRequest();
+        }
     }
 
     [HttpDelete("{id}")]
@@ -64,20 +96,29 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteDirector(int id)
     {
-        var deleted = await _directorService.DeleteDirector(id);
-
-        _logger.LogInformation($"DeleteDirector called with id {id}");
-
-        if (deleted)
+        try
         {
-            _logger.LogInformation($"Director with id {id} deleted");
+            var deleted = await _directorService.DeleteDirector(id);
 
-            return NoContent();
+            _logger.LogInformation($"DeleteDirector called with id {id}");
+
+            if (deleted)
+            {
+                _logger.LogInformation($"Director with id {id} deleted");
+
+                return NoContent();
+            }
+
+            _logger.LogWarning($"Director with id {id} could not be deleted");
+
+            return NotFound();
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while deleting the director");
 
-        _logger.LogWarning($"Director with id {id} could not be deleted");
-
-        return NotFound();
+            return StatusCode(500);
+        }
     }
 
     [HttpPut("{id}")]
@@ -85,10 +126,27 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateDirector(int id, DirectorDto directorDto)
     {
-        var director = await _directorService.UpdateDirector(id, directorDto);
+        try
+        {
+            _logger.LogInformation($"UpdateDirector called with id {id}");
 
-        _logger.LogInformation($"UpdateDirector called with id {id}");
+            var director = await _directorService.UpdateDirector(id, directorDto);
 
-        return Ok(director);
+            _logger.LogInformation($"Director with id {id} updated");
+
+            return Ok(director);
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Director not found");
+
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while updating the director");
+
+            return StatusCode(500);
+        }
     }
 }

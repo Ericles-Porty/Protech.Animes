@@ -1,41 +1,36 @@
 using Protech.Animes.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
-using Protech.Animes.Infrastructure.Data.Repositories;
-using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Application.Services;
-using Protech.Animes.Application.UseCases;
+using Protech.Animes.API.Extensions.DependencyInjection;
+using Protech.Animes.API.Extensions.Auth.JWT;
+using Protech.Animes.API.Extensions.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("ProtechAnimeDbConnection");
 
-// Add services to the container.
 builder.Services.AddDbContext<ProtechAnimesDbContext>(options => options.UseNpgsql(connectionString));
 
-// Add mapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+RepositoryDependenciesInjectionExtension.AddRepositoryDependencies(builder.Services);
+
+ServicesDependenciesInjectionExtension.AddServicesDependencies(builder.Services);
+
+UseCasesDependenciesInjectionExtension.AddUseCases(builder.Services);
+
+JwtConfigDependenciesInjectionExtension.AddJwtConfigDependencies(builder.Services, builder.Configuration);
+
+builder.Services.AddEndpointsApiExplorer();
+
+SwaggerDefinitionExtensions.AddSwaggerDefinition(builder.Services);
+
+JwtAuthenticationExtensions.AddJwtAuthentication(builder.Services, builder.Configuration);
 
 builder.Services.AddControllers();
 
-// Repositories
-builder.Services.AddScoped<IAnimeRepository, AnimeRepository>();
-builder.Services.AddScoped<IDirectorRepository, DirectorRepository>();
-
-// Services
-builder.Services.AddScoped<IAnimeService, AnimeService>();
-builder.Services.AddScoped<IDirectorService, DirectorService>();
-
-// Use cases
-builder.Services.AddScoped<CreateAnimeUseCase>();
-
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -44,6 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

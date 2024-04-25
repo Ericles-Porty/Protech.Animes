@@ -10,7 +10,10 @@ public class ProtechAnimesDbContext : DbContext
     public ProtechAnimesDbContext(DbContextOptions<ProtechAnimesDbContext> options) : base(options) { }
 
     public DbSet<Anime> Animes { get; set; }
+
     public DbSet<Director> Directors { get; set; }
+
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +21,26 @@ public class ProtechAnimesDbContext : DbContext
             .HasOne(a => a.Director)
             .WithMany(d => d.Animes)
             .HasForeignKey(a => a.DirectorId);
+
+        modelBuilder.Entity<Anime>()
+            .HasIndex(a => a.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<Director>()
+            .HasIndex(d => d.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Role)
+            .HasDefaultValue("User");
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Id);
+
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
