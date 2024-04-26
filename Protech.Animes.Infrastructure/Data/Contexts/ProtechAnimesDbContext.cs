@@ -1,6 +1,7 @@
 namespace Protech.Animes.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Infrastructure.Data.Seed;
 
 public class ProtechAnimesDbContext : DbContext
 {
@@ -40,6 +41,8 @@ public class ProtechAnimesDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Id);
+
+        modelBuilder.SeedData();
 
     }
 
