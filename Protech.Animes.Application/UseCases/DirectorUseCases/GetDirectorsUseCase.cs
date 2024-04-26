@@ -13,8 +13,16 @@ public class GetDirectorsUseCase
         _directorService = directorService;
     }
 
-    public async Task<IEnumerable<DirectorDto>> Execute() =>
-        await _directorService.GetDirectors();
+    public async Task<IEnumerable<DirectorDto>> Execute(int? page, int? pageSize)
+    {
+        if (!page.HasValue || !pageSize.HasValue)
+            return await _directorService.GetDirectors();
+
+        if (page.Value < 1 || pageSize.Value < 1)
+            throw new ArgumentException("Page and pageSize must be greater than 0");
+
+        return await _directorService.GetDirectorsPaginated(page.Value, pageSize.Value);
+    }
 
 
 }

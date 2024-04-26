@@ -55,7 +55,7 @@ public class DirectorService : IDirectorService
     public async Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto directorDto)
     {
         var director = _mapper.Map<Director>(directorDto);
-        
+
         var updatedDirector = await _directorRepository.UpdateAsync(id, director);
         if (updatedDirector is null) throw new NotFoundException("Director not found");
 
@@ -72,6 +72,30 @@ public class DirectorService : IDirectorService
         var directorDto = _mapper.Map<DirectorDto>(director);
 
         return directorDto;
+    }
+
+    public async Task<IEnumerable<DirectorDto>> GetDirectorsByNamePattern(string name)
+    {
+        var directors = await _directorRepository.GetByNamePatternAsync(name);
+        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
+
+        return directorsDto;
+    }
+
+    public async Task<IEnumerable<DirectorDto>> GetDirectorsPaginated(int page, int pageSize)
+    {
+        var directors = await _directorRepository.GetAllPaginatedAsync(page, pageSize);
+        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
+
+        return directorsDto;
+    }
+
+    public async Task<IEnumerable<DirectorDto>> GetDirectorsByNamePatternPaginated(string name, int page, int pageSize)
+    {
+        var directors = await _directorRepository.GetByNamePatternPaginatedAsync(name, page, pageSize);
+        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
+
+        return directorsDto;
     }
 }
 

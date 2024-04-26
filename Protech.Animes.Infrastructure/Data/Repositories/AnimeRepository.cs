@@ -226,5 +226,4 @@ public class AnimeRepository : IAnimeRepository
             .Where(a => EF.Functions.ILike(a.Summary, $"%{keyword}%"))
             .Include(a => a.Director);
     }
-
 }
