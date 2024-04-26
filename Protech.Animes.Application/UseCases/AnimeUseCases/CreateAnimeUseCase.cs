@@ -5,7 +5,7 @@ using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
 using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 
-namespace Protech.Animes.Application.UseCases.Anime;
+namespace Protech.Animes.Application.UseCases.AnimeUseCases;
 
 public class CreateAnimeUseCase
 {

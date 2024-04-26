@@ -1,8 +1,7 @@
-using AutoMapper;
 using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Exceptions;
 
-namespace Protech.Animes.Application.UseCases.Anime;
+namespace Protech.Animes.Application.UseCases.AnimeUseCases;
 
 public class DeleteAnimeUseCase
 {
