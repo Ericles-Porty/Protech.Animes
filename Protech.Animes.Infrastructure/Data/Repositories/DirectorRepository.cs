@@ -17,11 +17,11 @@ public class DirectorRepository : IDirectorRepository
 
     public async Task<Director> CreateAsync(Director entity)
     {
-        var director = await _dbContext.Directors.AddAsync(entity);
+        await _dbContext.Directors.AddAsync(entity);
 
         await _dbContext.SaveChangesAsync();
 
-        return director.Entity;
+        return entity;
     }
 
     public async Task<bool> DeleteAsync(int id)

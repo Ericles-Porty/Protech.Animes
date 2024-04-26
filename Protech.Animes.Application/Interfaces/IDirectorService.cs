@@ -9,7 +9,7 @@ public interface IDirectorService
 
     Task<DirectorDto> GetDirector(int id);
 
-    Task<DirectorDto> GetDirectorByName(string name);
+    Task<DirectorDto?> GetDirectorByName(string name);
 
     Task<IEnumerable<DirectorDto>> GetDirectorsByNamePattern(string name);
     Task<IEnumerable<DirectorDto>> GetDirectorsByNamePatternPaginated(string name, int page, int pageSize);

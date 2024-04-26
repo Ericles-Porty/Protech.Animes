@@ -11,21 +11,29 @@ namespace Protech.Animes.API.Controllers;
 [Route("api/[controller]")]
 public class DirectorController : ControllerBase
 {
-
-    private readonly IDirectorService _directorService;
+    private readonly GetDirectorUseCase _getDirectorUseCase;
     private readonly GetDirectorsUseCase _getDirectorsUseCase;
+    private readonly GetDirectorsByNameUseCase _getDirectorsByNameUseCase;
+    private readonly CreateDirectorUseCase _createDirectorUseCase;
+    private readonly UpdateDirectorUseCase _updateDirectorUseCase;
     private readonly DeleteDirectorUseCase _deleteDirectorUseCase;
     private readonly ILogger<DirectorController> _logger;
 
     public DirectorController(
-        IDirectorService directorService,
+        GetDirectorUseCase getDirectorUseCase,
         GetDirectorsUseCase getDirectorsUseCase,
+        GetDirectorsByNameUseCase getDirectorsByNameUseCase,
+        CreateDirectorUseCase createDirectorUseCase,
+        UpdateDirectorUseCase updateDirectorUseCase,
         DeleteDirectorUseCase deleteDirectorUseCase,
         ILogger<DirectorController> logger
         )
     {
-        _directorService = directorService;
+        _getDirectorUseCase = getDirectorUseCase;
         _getDirectorsUseCase = getDirectorsUseCase;
+        _getDirectorsByNameUseCase = getDirectorsByNameUseCase;
+        _createDirectorUseCase = createDirectorUseCase;
+        _updateDirectorUseCase = updateDirectorUseCase;
         _deleteDirectorUseCase = deleteDirectorUseCase;
         _logger = logger;
     }
@@ -33,9 +41,10 @@ public class DirectorController : ControllerBase
     /// <summary>
     /// Get all directors
     /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(500)]
     // [Authorize]
     public async Task<IActionResult> GetDirectors([FromQuery] int? page, [FromQuery] int? limit)
     {
@@ -66,18 +75,17 @@ public class DirectorController : ControllerBase
     /// <summary>
     /// Get a director by id
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(DirectorDto), 200)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetDirector(int id)
     {
         try
         {
             _logger.LogInformation($"GetDirector called with id {id}");
 
-            var director = await _directorService.GetDirector(id);
+            var director = await _getDirectorUseCase.Execute(id);
 
             _logger.LogInformation($"Director with id {id} found");
 
@@ -100,17 +108,17 @@ public class DirectorController : ControllerBase
     /// <summary>
     /// Get directors by name pattern
     /// </summary>
-    /// <param name="name"></param>
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetDirectorsByName(string name)
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> GetDirectorsByName(string name, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
         {
             _logger.LogInformation($"GetDirectorByName called with name {name}");
 
-            var director = await _directorService.GetDirectorsByNamePattern(name);
+            var director = await _getDirectorsByNameUseCase.Execute(name, page, pageSize);
 
             _logger.LogInformation($"Director with name {name} found");
 
@@ -133,45 +141,50 @@ public class DirectorController : ControllerBase
     /// <summary>
     /// Create a director
     /// </summary>
-    /// <param name="createDirectorDto"></param>
-    /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(DirectorDto), 201)]
     [ProducesResponseType(400)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> CreateDirector(CreateDirectorDto createDirectorDto)
     {
         try
         {
             _logger.LogInformation("CreateDirector called");
 
-            var director = await _directorService.CreateDirector(createDirectorDto);
+            var director = await _createDirectorUseCase.Execute(createDirectorDto);
 
             return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
+        }
+        catch(DuplicatedEntityException ex){
+            _logger.LogWarning(ex, "Director already exists");
+
+            var error = new { message = ex.Message };
+
+            return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while creating the director");
-
-            return BadRequest();
+            
+            return StatusCode(500);
         }
     }
 
     /// <summary>
     /// Delete a director by id
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> DeleteDirector(int id)
     {
         try
         {
-            var deleted = await _directorService.DeleteDirector(id);
-
             _logger.LogInformation($"DeleteDirector called with id {id}");
+
+            var deleted = await _deleteDirectorUseCase.Execute(id);
 
             if (deleted)
             {
@@ -182,7 +195,9 @@ public class DirectorController : ControllerBase
 
             _logger.LogWarning($"Director with id {id} could not be deleted");
 
-            return NotFound();
+            var error = new { message = "Director not found" };
+
+            return NotFound(error);
         }
         catch (InvalidOperationException ex)
         {
@@ -203,23 +218,29 @@ public class DirectorController : ControllerBase
     /// <summary>
     /// Update a director by id
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="updateDirectorDto"></param>
-    /// <returns></returns>
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(DirectorDto), 200)]
+    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto)
     {
         try
         {
             _logger.LogInformation($"UpdateDirector called with id {id}");
 
-            var director = await _directorService.UpdateDirector(id, updateDirectorDto);
+            var director = await _updateDirectorUseCase.Execute(id, updateDirectorDto);
 
             _logger.LogInformation($"Director with id {id} updated");
 
             return Ok(director);
+        }
+        catch(BadRequestException ex){
+            _logger.LogWarning(ex, "Id does not match");
+
+            var error = new { message = ex.Message };
+
+            return BadRequest(error);
         }
         catch (NotFoundException ex)
         {

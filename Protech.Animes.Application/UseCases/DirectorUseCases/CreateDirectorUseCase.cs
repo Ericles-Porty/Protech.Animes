@@ -16,7 +16,7 @@ public class CreateDirectorUseCase
     public async Task<DirectorDto> Execute(CreateDirectorDto createDirectorDto)
     {
         var directorDto = await _directorService.GetDirectorByName(createDirectorDto.Name);
-        if (directorDto is null) throw new DuplicatedEntityException("Director", "Name");
+        if (directorDto is not null) throw new DuplicatedEntityException("Director", "Name");
 
         return await _directorService.CreateDirector(createDirectorDto);
     }

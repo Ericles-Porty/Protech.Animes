@@ -64,10 +64,10 @@ public class DirectorService : IDirectorService
         return directorDtoUpdated;
     }
 
-    public async Task<DirectorDto> GetDirectorByName(string name)
+    public async Task<DirectorDto?> GetDirectorByName(string name)
     {
         var director = await _directorRepository.GetByNameAsync(name);
-        if (director is null) throw new NotFoundException("Director not found");
+        if (director is null) return null;
 
         var directorDto = _mapper.Map<DirectorDto>(director);
 

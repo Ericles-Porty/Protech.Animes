@@ -10,8 +10,9 @@ public class DirectorProfile : Profile
     {
         CreateMap<Director, DirectorDto>().ReverseMap();
 
-        CreateMap<Director, CreateDirectorDto>().ReverseMap();
+        CreateMap<UpdateDirectorDto, Director>().ReverseMap();
 
-        CreateMap<DirectorDto, UpdateDirectorDto>().ReverseMap();
+        CreateMap<CreateDirectorDto, Director>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

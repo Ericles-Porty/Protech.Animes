@@ -17,7 +17,10 @@ public class UpdateDirectorUseCase
     public async Task<DirectorDto> Execute(int id, UpdateDirectorDto updateDirectorDto)
     {
         if (id != updateDirectorDto.Id) throw new BadRequestException("Id does not match.");
-        
+
+        var director = await _directorService.GetDirector(id);
+        if (director == null) throw new NotFoundException("Director not found.");
+
         return await _directorService.UpdateDirector(id, updateDirectorDto);
     }
 }
