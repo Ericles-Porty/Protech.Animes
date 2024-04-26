@@ -149,19 +149,47 @@ public class AnimeRepository : IAnimeRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Anime>> GetByDirectorNameAsync(string directorName)
+    {
+        return await FilterByDirectorName(directorName).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Anime>> GetByDirectorNamePaginatedAsync(string directorName, int page, int pageSize)
+    {
+        return await FilterByDirectorName(directorName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Anime>> GetByKeywordSummaryAsync(string keyword)
     {
-        return await _dbContext.Animes
-            .AsNoTracking()
-            .Where(a => a.Summary.Contains(keyword))
-            .ToListAsync();
+        return await FilterBySummaryKeyword(keyword).ToListAsync();
     }
 
     public async Task<IEnumerable<Anime>> GetByKeywordSummaryPaginatedAsync(string keyword, int page, int pageSize)
     {
+        return await FilterBySummaryKeyword(keyword)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<Anime?> GetByNameAsync(string name)
+    {
         return await _dbContext.Animes
             .AsNoTracking()
-            .Where(a => a.Summary.Contains(keyword))
+            .SingleOrDefaultAsync(a => a.Name == name);
+    }
+
+    public async Task<IEnumerable<Anime>> GetByNamePatternAsync(string name)
+    {
+        return await FilterByNamePattern(name).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Anime>> GetByNamePatternPaginatedAsync(string name, int page, int pageSize)
+    {
+        return await FilterByNamePattern(name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -175,28 +203,28 @@ public class AnimeRepository : IAnimeRepository
             .Include(a => a.Director);
     }
 
-    public async Task<Anime?> GetByNameAsync(string name)
+    private IQueryable<Anime> FilterByDirectorName(string directorName)
     {
-        return await _dbContext.Animes
+        return _dbContext.Animes
             .AsNoTracking()
-            .SingleOrDefaultAsync(a => a.Name == name);
+            .Where(a => EF.Functions.ILike(a.Director.Name, $"%{directorName}%"))
+            .Include(a => a.Director);
     }
 
-    public async Task<IEnumerable<Anime>> GetByNamePatternAsync(string name)
+    private IQueryable<Anime> FilterByNamePattern(string name)
     {
-        return await _dbContext.Animes
+        return _dbContext.Animes
             .AsNoTracking()
-            .Where(a => a.Name.Contains(name))
-            .ToListAsync();
+            .Where(a => EF.Functions.ILike(a.Name, $"%{name}%"))
+            .Include(a => a.Director);
     }
 
-    public async Task<IEnumerable<Anime>> GetByNamePatternPaginatedAsync(string name, int page, int pageSize)
+    private IQueryable<Anime> FilterBySummaryKeyword(string keyword)
     {
-        return await _dbContext.Animes
+        return _dbContext.Animes
             .AsNoTracking()
-            .Where(a => a.Name.Contains(name))
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+            .Where(a => EF.Functions.ILike(a.Summary, $"%{keyword}%"))
+            .Include(a => a.Director);
     }
+
 }

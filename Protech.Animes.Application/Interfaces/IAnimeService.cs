@@ -24,6 +24,9 @@ public interface IAnimeService
     Task<IEnumerable<AnimeDto>> GetAnimesByDirector(int directorId);
     Task<IEnumerable<AnimeDto>> GetAnimesByDirectorPaginated(int directorId, int page, int pageSize);
 
+    Task<IEnumerable<AnimeDto>> GetAnimesByDirectorName(string directorName);
+    Task<IEnumerable<AnimeDto>> GetAnimesByDirectorNamePaginated(string directorName, int page, int pageSize);
+
     Task<IEnumerable<AnimeDto>> GetAnimesBySummaryKeyword(string keyword);
     Task<IEnumerable<AnimeDto>> GetAnimesBySummaryKeywordPaginated(string keyword, int page, int pageSize);
 }

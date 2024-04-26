@@ -118,6 +118,24 @@ public class AnimeService : IAnimeService
         return animesDto;
     }
 
+    public async Task<IEnumerable<AnimeDto>> GetAnimesByDirectorName(string directorName)
+    {
+        var animes = await _animeRepository.GetByDirectorNameAsync(directorName);
+
+        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
+
+        return animesDto;
+    }
+
+    public async Task<IEnumerable<AnimeDto>> GetAnimesByDirectorNamePaginated(string directorName, int page, int pageSize)
+    {
+        var animes = await _animeRepository.GetByDirectorNamePaginatedAsync(directorName, page, pageSize);
+
+        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
+
+        return animesDto;
+    }
+
     public async Task<IEnumerable<AnimeDto>> GetAnimesBySummaryKeyword(string keyword)
     {
         var animes = await _animeRepository.GetByKeywordSummaryAsync(keyword);
