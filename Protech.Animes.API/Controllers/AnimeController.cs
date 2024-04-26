@@ -11,33 +11,36 @@ namespace Protech.Animes.API.Controllers;
 public class AnimeController : ControllerBase
 {
     private readonly ILogger<AnimeController> _logger;
-    private readonly IAnimeService _animeService;
     private readonly CreateAnimeUseCase _createAnimeUseCase;
     private readonly UpdateAnimeUseCase _updateAnimeUseCase;
     private readonly GetAnimesUseCase _getAnimesUseCase;
     private readonly GetAnimeUseCase _getAnimeUsecase;
     private readonly DeleteAnimeUseCase _deleteAnimeUseCase;
     private readonly GetAnimesByNameUseCase _getAnimesByNameUseCase;
+    private readonly GetAnimesByDirectorUseCase _getAnimesByDirectorUseCase;
+    private readonly GetAnimesByDirectorNameUseCase _getAnimesByDirectorNameUseCase;
 
     public AnimeController(
         ILogger<AnimeController> logger,
-        IAnimeService animeService,
         CreateAnimeUseCase createAnimeUseCase,
         UpdateAnimeUseCase updateAnimeUseCase,
         GetAnimesUseCase getAnimesUseCase,
         GetAnimeUseCase getAnimeUsecase,
         DeleteAnimeUseCase deleteAnimeUseCase,
-        GetAnimesByNameUseCase getAnimesByNameUseCase
+        GetAnimesByNameUseCase getAnimesByNameUseCase,
+        GetAnimesByDirectorUseCase getAnimesByDirectorUseCase,
+        GetAnimesByDirectorNameUseCase getAnimesByDirectorNameUseCase
         )
     {
         _logger = logger;
-        _animeService = animeService;
         _createAnimeUseCase = createAnimeUseCase;
         _updateAnimeUseCase = updateAnimeUseCase;
         _getAnimesUseCase = getAnimesUseCase;
         _getAnimeUsecase = getAnimeUsecase;
         _deleteAnimeUseCase = deleteAnimeUseCase;
         _getAnimesByNameUseCase = getAnimesByNameUseCase;
+        _getAnimesByDirectorUseCase = getAnimesByDirectorUseCase;
+        _getAnimesByDirectorNameUseCase = getAnimesByDirectorNameUseCase;
     }
 
     [HttpGet]
@@ -218,29 +221,6 @@ public class AnimeController : ControllerBase
         }
     }
 
-    [HttpGet("director/{directorId}")]
-    [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
-    public async Task<IActionResult> GetAnimesByDirector(int directorId)
-    {
-        try
-        {
-            _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
-
-            var animes = await _animeService.GetAnimesByDirector(directorId);
-
-            return Ok(animes);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while getting the animes by director");
-
-            var error = new ErrorModel { Message = "An error occurred while getting the animes by director", StatusCode = 500 };
-
-            return StatusCode(500, error);
-        }
-    }
-
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 500)]
@@ -254,11 +234,81 @@ public class AnimeController : ControllerBase
 
             return Ok(animes);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while getting the animes by name");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+
+            return BadRequest(error);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes by name");
 
             var error = new ErrorModel { Message = "An error occurred while getting the animes by name", StatusCode = 500 };
+
+            return StatusCode(500, error);
+        }
+    }
+
+    [HttpGet("director/{directorId}")]
+    [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 500)]
+    public async Task<IActionResult> GetAnimesByDirector(int directorId, [FromQuery] int? page, [FromQuery] int? pageSize)
+    {
+        try
+        {
+            _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
+
+            var animes = await _getAnimesByDirectorUseCase.Execute(directorId, page, pageSize);
+
+            return Ok(animes);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by director");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 500 };
+
+            return BadRequest(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by director");
+
+            var error = new ErrorModel { Message = "An error occurred while getting the animes by director", StatusCode = 500 };
+
+            return StatusCode(500, error);
+        }
+    }
+
+    [HttpGet("director/name/{directorName}")]
+    [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 500)]
+    public async Task<IActionResult> GetAnimesByDirectorName(string directorName, [FromQuery] int? page, [FromQuery] int? pageSize)
+    {
+        try
+        {
+            _logger.LogInformation($"GetAnimesByDirectorName called with directorName {directorName}");
+
+            var animes = await _getAnimesByDirectorNameUseCase.Execute(directorName, page, pageSize);
+
+            return Ok(animes);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by director name");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+
+            return BadRequest(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by director name");
+
+            var error = new ErrorModel { Message = "An error occurred while getting the animes by director name", StatusCode = 500 };
 
             return StatusCode(500, error);
         }
