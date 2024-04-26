@@ -20,5 +20,9 @@ public class AnimeProfile : Profile
 
         CreateMap<Anime, CreateAnimeDto>()
             .ForMember(dest => dest.DirectorName, opt => opt.MapFrom(src => src.Director.Name));
+
+        CreateMap<CreateAnimeDto, AnimeDto>().ReverseMap();
+
+        CreateMap<UpdateAnimeDto, AnimeDto>().ReverseMap();
     }
 }

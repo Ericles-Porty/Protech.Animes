@@ -1,6 +1,7 @@
 namespace Protech.Animes.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Infrastructure.Data.Seed;
 
 public class ProtechAnimesDbContext : DbContext
 {
@@ -20,7 +21,8 @@ public class ProtechAnimesDbContext : DbContext
         modelBuilder.Entity<Anime>()
             .HasOne(a => a.Director)
             .WithMany(d => d.Animes)
-            .HasForeignKey(a => a.DirectorId);
+            .HasForeignKey(a => a.DirectorId)
+            .IsRequired();
 
         modelBuilder.Entity<Anime>()
             .HasIndex(a => a.Name)
@@ -40,6 +42,8 @@ public class ProtechAnimesDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Id);
+
+        // modelBuilder.SeedData();
 
     }
 

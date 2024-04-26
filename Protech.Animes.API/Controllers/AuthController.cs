@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.UseCases;
+using Protech.Animes.Application.UseCases.Auth;
 
 namespace Protech.Animes.API.Controllers;
 
+/// <summary>
+/// Controller responsible for handling authentication requests.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -21,6 +24,9 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Register a new user.
+    /// </summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(UserDto), 201)]
     public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
@@ -43,6 +49,9 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Login a user.
+    /// </summary>
     [HttpPost("login")]
     [ProducesResponseType(typeof(UserDto), 200)]
     public async Task<IActionResult> Login(LoginUserDto loginUserDto)

@@ -38,6 +38,10 @@ public static class SwaggerDefinitionExtensions
                     Array.Empty<string>()
                 },
             });
+
+            var filePath = Path.Combine(AppContext.BaseDirectory, "Protech.Animes.API.xml");
+
+            c.IncludeXmlComments(filePath);
         });
 
         return services;

@@ -1,9 +1,8 @@
-
 using System.Security.Authentication;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 
-namespace Protech.Animes.Application.UseCases;
+namespace Protech.Animes.Application.UseCases.Auth;
 
 public class LoginUserUseCase
 {
