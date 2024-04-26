@@ -20,7 +20,7 @@ Este projeto se trata de um desafio técnico proposto pela empresa Protech Solut
 4. Execute o comando `dotnet ef database update -c ProtechAnimesDbContext` para criar o banco de dados
 5. Volte para a pasta raiz do projeto `cd ..`
 6. Execute o comando `dotnet run --project Protech.Animes.API` para iniciar a API
-7. Acesse a documentação da API em `https://localhost:5001/swagger/index.html`
+7. Acesse a documentação da API em `https://localhost:5088/swagger/index.html`
 
 ## Tecnologias utilizadas
 - .NET 8
