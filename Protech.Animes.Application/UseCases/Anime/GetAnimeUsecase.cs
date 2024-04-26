@@ -3,7 +3,7 @@ using Protech.Animes.Application.Interfaces;
 
 namespace Protech.Animes.Application.UseCases.Anime;
 
-public class GetAnimeUsecase(IAnimeService animeService)
+public class GetAnimeUseCase(IAnimeService animeService)
 {
 
     private readonly IAnimeService _animeService = animeService;

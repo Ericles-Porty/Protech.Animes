@@ -15,7 +15,7 @@ public class AnimeController : ControllerBase
     private readonly CreateAnimeUseCase _createAnimeUseCase;
     private readonly UpdateAnimeUseCase _updateAnimeUseCase;
     private readonly GetAnimesUseCase _getAnimesUseCase;
-    private readonly GetAnimeUsecase _getAnimeUsecase;
+    private readonly GetAnimeUseCase _getAnimeUsecase;
     private readonly DeleteAnimeUseCase _deleteAnimeUseCase;
 
     public AnimeController(
@@ -24,7 +24,7 @@ public class AnimeController : ControllerBase
         CreateAnimeUseCase createAnimeUseCase,
         UpdateAnimeUseCase updateAnimeUseCase,
         GetAnimesUseCase getAnimesUseCase,
-        GetAnimeUsecase getAnimeUsecase,
+        GetAnimeUseCase getAnimeUsecase,
         DeleteAnimeUseCase deleteAnimeUseCase
         )
     {
@@ -70,7 +70,7 @@ public class AnimeController : ControllerBase
         {
             _logger.LogInformation($"GetAnime called with id {id}");
 
-            var anime = await _animeService.GetAnime(id);
+            var anime = await _getAnimeUsecase.Execute(id);
 
             _logger.LogInformation($"Anime with id {id} found");
 
