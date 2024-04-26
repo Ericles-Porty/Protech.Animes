@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.UseCases;
+using Protech.Animes.Application.UseCases.Auth;
 
 namespace Protech.Animes.API.Controllers;
 

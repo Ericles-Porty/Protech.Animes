@@ -1,7 +1,7 @@
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 
-namespace Protech.Animes.Application.UseCases;
+namespace Protech.Animes.Application.UseCases.Anime;
 
 public class GetAnimesUseCase
 {

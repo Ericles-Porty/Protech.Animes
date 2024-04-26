@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Application.UseCases;
+using Protech.Animes.Application.UseCases.Anime;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
@@ -10,19 +10,31 @@ namespace Protech.Animes.API.Controllers;
 [Route("api/[controller]")]
 public class AnimeController : ControllerBase
 {
+    private readonly ILogger<AnimeController> _logger;
     private readonly IAnimeService _animeService;
     private readonly CreateAnimeUseCase _createAnimeUseCase;
     private readonly UpdateAnimeUseCase _updateAnimeUseCase;
     private readonly GetAnimesUseCase _getAnimesUseCase;
-    private readonly ILogger<AnimeController> _logger;
+    private readonly GetAnimeUsecase _getAnimeUsecase;
+    private readonly DeleteAnimeUseCase _deleteAnimeUseCase;
 
-    public AnimeController(IAnimeService animeService, CreateAnimeUseCase createAnimeUseCase, ILogger<AnimeController> logger, UpdateAnimeUseCase updateAnimeUseCase, GetAnimesUseCase getAnimesUseCase)
+    public AnimeController(
+        ILogger<AnimeController> logger,
+        IAnimeService animeService,
+        CreateAnimeUseCase createAnimeUseCase,
+        UpdateAnimeUseCase updateAnimeUseCase,
+        GetAnimesUseCase getAnimesUseCase,
+        GetAnimeUsecase getAnimeUsecase,
+        DeleteAnimeUseCase deleteAnimeUseCase
+        )
     {
         _logger = logger;
         _animeService = animeService;
         _createAnimeUseCase = createAnimeUseCase;
         _updateAnimeUseCase = updateAnimeUseCase;
         _getAnimesUseCase = getAnimesUseCase;
+        _getAnimeUsecase = getAnimeUsecase;
+        _deleteAnimeUseCase = deleteAnimeUseCase;
     }
 
     [HttpGet]
@@ -175,11 +187,12 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            var deleted = await _animeService.DeleteAnime(id);
-
             _logger.LogInformation($"DeleteAnime called with id {id}");
 
-            if (deleted)
+            var deleted = await _deleteAnimeUseCase.Execute(id);
+
+
+            if (deleted is true)
             {
                 _logger.LogInformation($"Anime with id {id} deleted");
 
