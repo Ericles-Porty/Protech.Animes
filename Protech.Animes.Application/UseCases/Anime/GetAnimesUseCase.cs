@@ -16,6 +16,9 @@ public class GetAnimesUseCase
     {
         if (page.HasValue && pageSize.HasValue)
         {
+            if (page.Value <= 0 || pageSize.Value <= 0)
+                throw new ArgumentException("Page and PageSize must be greater than 0");
+
             return await _animeService.GetAnimesPaginated(page.Value, pageSize.Value);
         }
 
