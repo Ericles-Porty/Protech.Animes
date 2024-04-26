@@ -13,16 +13,19 @@ public class DirectorController : ControllerBase
 {
 
     private readonly IDirectorService _directorService;
+    private readonly GetDirectorsUseCase _getDirectorsUseCase;
     private readonly DeleteDirectorUseCase _deleteDirectorUseCase;
     private readonly ILogger<DirectorController> _logger;
 
     public DirectorController(
         IDirectorService directorService,
+        GetDirectorsUseCase getDirectorsUseCase,
         DeleteDirectorUseCase deleteDirectorUseCase,
         ILogger<DirectorController> logger
         )
     {
         _directorService = directorService;
+        _getDirectorsUseCase = getDirectorsUseCase;
         _deleteDirectorUseCase = deleteDirectorUseCase;
         _logger = logger;
     }
@@ -33,16 +36,24 @@ public class DirectorController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
-    [Authorize]
-    public async Task<IActionResult> GetDirectors()
+    // [Authorize]
+    public async Task<IActionResult> GetDirectors([FromQuery] int? page, [FromQuery] int? limit)
     {
         try
         {
             _logger.LogInformation("GetDirectors called");
 
-            var directors = await _directorService.GetDirectors();
+            var directors = await _getDirectorsUseCase.Execute(page, limit);
 
             return Ok(directors);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid page or limit");
+
+            var error = new { message = ex.Message };
+
+            return BadRequest(error);
         }
         catch (Exception ex)
         {
@@ -69,6 +80,39 @@ public class DirectorController : ControllerBase
             var director = await _directorService.GetDirector(id);
 
             _logger.LogInformation($"Director with id {id} found");
+
+            return Ok(director);
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Director not found");
+
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the director");
+
+            return StatusCode(500);
+        }
+    }
+
+    /// <summary>
+    /// Get directors by name pattern
+    /// </summary>
+    /// <param name="name"></param>
+    [HttpGet("name/{name}")]
+    [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetDirectorsByName(string name)
+    {
+        try
+        {
+            _logger.LogInformation($"GetDirectorByName called with name {name}");
+
+            var director = await _directorService.GetDirectorsByNamePattern(name);
+
+            _logger.LogInformation($"Director with name {name} found");
 
             return Ok(director);
         }
