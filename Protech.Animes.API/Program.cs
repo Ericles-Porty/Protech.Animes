@@ -10,19 +10,14 @@ var connectionString = builder.Configuration.GetConnectionString("ProtechAnimeDb
 
 builder.Services.AddDbContext<ProtechAnimesDbContext>(options => options.UseNpgsql(connectionString));
 
-
 RepositoryDependenciesInjectionExtension.AddRepositoryDependencies(builder.Services);
-
 ServicesDependenciesInjectionExtension.AddServicesDependencies(builder.Services);
-
 UseCasesDependenciesInjectionExtension.AddUseCases(builder.Services);
-
 JwtConfigDependenciesInjectionExtension.AddJwtConfigDependencies(builder.Services, builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 
 SwaggerDefinitionExtensions.AddSwaggerDefinition(builder.Services);
-
 JwtAuthenticationExtensions.AddJwtAuthentication(builder.Services, builder.Configuration);
 
 builder.Services.AddControllers();
