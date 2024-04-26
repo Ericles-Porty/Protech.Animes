@@ -3,7 +3,7 @@ using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Exceptions;
 
-namespace Protech.Animes.Application.UseCases.Anime;
+namespace Protech.Animes.Application.UseCases.AnimeUseCases;
 
 public class UpdateAnimeUseCase
 {

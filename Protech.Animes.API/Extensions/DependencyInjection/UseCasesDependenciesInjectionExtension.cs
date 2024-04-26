@@ -1,5 +1,5 @@
-using Protech.Animes.Application.UseCases.Anime;
-using Protech.Animes.Application.UseCases.Auth;
+using Protech.Animes.Application.UseCases.AnimeUseCases;
+using Protech.Animes.Application.UseCases.AuthUseCases;
 
 namespace Protech.Animes.API.Extensions.DependencyInjection;
 

@@ -1,8 +1,9 @@
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Domain.Exceptions;
 
-namespace Protech.Animes.Application.UseCases.Auth;
+namespace Protech.Animes.Application.UseCases.AuthUseCases;
 
 public class RegisterUserUseCase
 {
@@ -17,6 +18,8 @@ public class RegisterUserUseCase
 
     public async Task<UserDto> Execute(RegisterUserDto createdUserDto)
     {
+        if (createdUserDto.Password != createdUserDto.ConfirmPassword) throw new BadRequestException("Passwords do not match");
+
         var user = new User
         {
             Id = Guid.NewGuid(),

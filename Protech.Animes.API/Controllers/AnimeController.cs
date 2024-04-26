@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Application.UseCases.Anime;
+using Protech.Animes.Application.UseCases.AnimeUseCases;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;

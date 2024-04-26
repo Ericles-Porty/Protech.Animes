@@ -18,11 +18,11 @@ public class UserRepository : IUserRepository
 
     public async Task<User> CreateAsync(User user)
     {
-        await _context.Users.AddAsync(user);
+        var userCreated = await _context.Users.AddAsync(user);
 
         await _context.SaveChangesAsync();
 
-        return user;
+        return userCreated.Entity;
     }
 
 

@@ -2,7 +2,7 @@ using System.Security.Authentication;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 
-namespace Protech.Animes.Application.UseCases.Auth;
+namespace Protech.Animes.Application.UseCases.AuthUseCases;
 
 public class LoginUserUseCase
 {
@@ -20,7 +20,7 @@ public class LoginUserUseCase
     {
         var user = await _userService.Login(email, password);
 
-        if (user is null) throw new InvalidCredentialException("User not found");
+        if (user is null) throw new InvalidCredentialException("Invalid credentials.");
 
         var jwtToken = _jwtTokenService.GenerateToken(user);
 
