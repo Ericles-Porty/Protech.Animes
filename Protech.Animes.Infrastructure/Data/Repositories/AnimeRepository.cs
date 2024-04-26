@@ -20,15 +20,37 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<Anime> CreateAsync(Anime entity)
     {
-        Console.WriteLine("Creating anime");
-        Console.WriteLine(entity);
-
         await _dbContext.Animes.AddAsync(entity);
+
         await _dbContext.SaveChangesAsync();
 
-        Console.WriteLine("Anime created");
-        Console.WriteLine(entity);
         return entity;
+    }
+
+    public async Task<Anime?> CreateAnimeWithDirectorAsync(Anime anime, Director director)
+    {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            var createdDirector = await _dbContext.Directors.AddAsync(director);
+            await _dbContext.SaveChangesAsync();
+
+            anime.DirectorId = createdDirector.Entity.Id;
+
+            await _dbContext.Animes.AddAsync(anime);
+            await _dbContext.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+
+            throw new Exception("An error occurred while creating the anime with director transaction", ex);
+        }
+
+        return anime;
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -38,6 +60,7 @@ public class AnimeRepository : IAnimeRepository
         if (anime is null) return false;
 
         _dbContext.Animes.Remove(anime);
+
         await _dbContext.SaveChangesAsync();
 
         return true;
@@ -72,9 +95,36 @@ public class AnimeRepository : IAnimeRepository
         anime.Name = entity.Name;
         anime.Summary = entity.Summary;
         anime.DirectorId = entity.DirectorId;
+
         await _dbContext.SaveChangesAsync();
 
         return anime;
+    }
+
+    public async Task<Anime?> UpdateAnimeWithNewDirectorAsync(Anime anime, Director director)
+    {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            var createdDirector = await _dbContext.Directors.AddAsync(director);
+            await _dbContext.SaveChangesAsync();
+
+            anime.DirectorId = createdDirector.Entity.Id;
+
+            var updatedAnime = _dbContext.Animes.Update(anime);
+            await _dbContext.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return updatedAnime.Entity;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+
+            throw new Exception("An error occurred while updating the anime with director transaction", ex);
+        }
     }
 
     public async Task<IEnumerable<Anime>> GetAllPaginatedAsync(int page, int pageSize)
@@ -125,7 +175,14 @@ public class AnimeRepository : IAnimeRepository
             .Include(a => a.Director);
     }
 
-    public async Task<IEnumerable<Anime>> GetByNameAsync(string name)
+    public async Task<Anime?> GetByNameAsync(string name)
+    {
+        return await _dbContext.Animes
+            .AsNoTracking()
+            .SingleOrDefaultAsync(a => a.Name == name);
+    }
+
+    public async Task<IEnumerable<Anime>> GetByNamePatternAsync(string name)
     {
         return await _dbContext.Animes
             .AsNoTracking()
@@ -133,7 +190,7 @@ public class AnimeRepository : IAnimeRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Anime>> GetByNamePaginatedAsync(string name, int page, int pageSize)
+    public async Task<IEnumerable<Anime>> GetByNamePatternPaginatedAsync(string name, int page, int pageSize)
     {
         return await _dbContext.Animes
             .AsNoTracking()
