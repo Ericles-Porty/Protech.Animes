@@ -13,14 +13,16 @@ public class AnimeController : ControllerBase
     private readonly IAnimeService _animeService;
     private readonly CreateAnimeUseCase _createAnimeUseCase;
     private readonly UpdateAnimeUseCase _updateAnimeUseCase;
+    private readonly GetAnimesUseCase _getAnimesUseCase;
     private readonly ILogger<AnimeController> _logger;
 
-    public AnimeController(IAnimeService animeService, CreateAnimeUseCase createAnimeUseCase, ILogger<AnimeController> logger, UpdateAnimeUseCase updateAnimeUseCase)
+    public AnimeController(IAnimeService animeService, CreateAnimeUseCase createAnimeUseCase, ILogger<AnimeController> logger, UpdateAnimeUseCase updateAnimeUseCase, GetAnimesUseCase getAnimesUseCase)
     {
         _logger = logger;
         _animeService = animeService;
         _createAnimeUseCase = createAnimeUseCase;
         _updateAnimeUseCase = updateAnimeUseCase;
+        _getAnimesUseCase = getAnimesUseCase;
     }
 
     [HttpGet]
@@ -32,7 +34,7 @@ public class AnimeController : ControllerBase
         {
             _logger.LogInformation("GetAnimes called");
 
-            var animes = await _animeService.GetAnimes();
+            var animes = await _getAnimesUseCase.Execute(page, pageSize);
 
             return Ok(animes);
         }
