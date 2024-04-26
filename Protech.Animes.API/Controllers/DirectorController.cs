@@ -7,6 +7,7 @@ using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class DirectorController : ControllerBase
@@ -45,7 +46,6 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(500)]
-    // [Authorize]
     public async Task<IActionResult> GetDirectors([FromQuery] int? page, [FromQuery] int? limit)
     {
         try
@@ -155,7 +155,8 @@ public class DirectorController : ControllerBase
 
             return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
         }
-        catch(DuplicatedEntityException ex){
+        catch (DuplicatedEntityException ex)
+        {
             _logger.LogWarning(ex, "Director already exists");
 
             var error = new { message = ex.Message };
@@ -165,7 +166,7 @@ public class DirectorController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while creating the director");
-            
+
             return StatusCode(500);
         }
     }
@@ -235,7 +236,8 @@ public class DirectorController : ControllerBase
 
             return Ok(director);
         }
-        catch(BadRequestException ex){
+        catch (BadRequestException ex)
+        {
             _logger.LogWarning(ex, "Id does not match");
 
             var error = new { message = ex.Message };

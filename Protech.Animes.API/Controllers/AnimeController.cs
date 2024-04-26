@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
 using Protech.Animes.Application.DTOs;
@@ -18,6 +19,7 @@ namespace Protech.Animes.API.Controllers;
 /// <response code="200">The resource was found</response>
 /// <response code="401">Unauthorized</response>
 /// <response code="403">Forbidden</response>
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AnimeController : ControllerBase
@@ -98,9 +100,6 @@ public class AnimeController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    /// <response code="200">Returns the anime</response>
-    /// <response code="404">The requested resource was not found</response>
-    /// <response code="500">An error occurred while processing the request</response>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(AnimeDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
