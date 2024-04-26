@@ -1,14 +1,12 @@
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Protech.Animes.API.Models;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.UseCases.AuthUseCases;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
 
-/// <summary>
-/// Controller responsible for handling authentication requests.
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -19,7 +17,11 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
 
 
-    public AuthController(RegisterUserUseCase RegisterUserUseCase, LoginUserUseCase LoginUserUseCase, ILogger<AuthController> logger)
+    public AuthController(
+        RegisterUserUseCase RegisterUserUseCase,
+        LoginUserUseCase LoginUserUseCase,
+        ILogger<AuthController> logger
+        )
     {
         _registerUserUseCase = RegisterUserUseCase;
         _loginUserUseCase = LoginUserUseCase;
@@ -31,7 +33,7 @@ public class AuthController : ControllerBase
     /// </summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(UserDto), 201)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
     {
@@ -49,8 +51,7 @@ public class AuthController : ControllerBase
         {
             _logger.LogWarning(ex, "Bad request");
 
-            var error = new { message = ex.Message };
-
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
             return BadRequest(error);
         }
         catch (Exception ex)
@@ -66,7 +67,7 @@ public class AuthController : ControllerBase
     /// </summary>
     [HttpPost("login")]
     [ProducesResponseType(typeof(UserDto), 200)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> Login(LoginUserDto loginUserDto)
     {
@@ -84,8 +85,7 @@ public class AuthController : ControllerBase
         {
             _logger.LogWarning(ex, "Invalid credentials");
 
-            var error = new { message = ex.Message };
-
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
             return BadRequest(error);
         }
         catch (Exception ex)
