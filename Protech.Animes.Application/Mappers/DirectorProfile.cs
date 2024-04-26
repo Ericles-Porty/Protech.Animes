@@ -8,8 +8,10 @@ public class DirectorProfile : Profile
 {
     public DirectorProfile()
     {
-        CreateMap<Director, DirectorDto>()
-            .ReverseMap();
+        CreateMap<Director, DirectorDto>().ReverseMap();
 
+        CreateMap<Director, CreateDirectorDto>().ReverseMap();
+
+        CreateMap<DirectorDto, UpdateDirectorDto>().ReverseMap();
     }
 }
