@@ -28,3 +28,18 @@ Este projeto se trata de um desafio técnico proposto pela empresa Protech Solut
 - Entity Framework Core
 - Swagger
   
+
+## Autor do projeto
+Ericles dos Santos Cunha
+- [Linkedin](https://www.linkedin.com/in/ericles-dos-santos-cunha/)
+- [GitHub](https://github.com/Ericles-Porty)
+
+## Material de apoio
+- [Documentação do Swagger](https://swagger.io/docs/)
+- [Documentação do Entity Framework Core](https://docs.microsoft.com/pt-br/ef/core/)
+- [Documentação do PostgreSQL](https://www.postgresql.org/docs/)
+- [Documentação do .NET](https://docs.microsoft.com/pt-br/dotnet/)
+- [Documentação do Docker](https://docs.docker.com/)
+- [Documentação do Docker Compose](https://docs.docker.com/compose/)
+- [Documentação do JWT](https://jwt.io/introduction/)
+- [Documentação de comentários XML no Swagger](https://github.com/domaindrivendev/Swashbuckle.AspNetCore#include-descriptions-from-xml-comments)
