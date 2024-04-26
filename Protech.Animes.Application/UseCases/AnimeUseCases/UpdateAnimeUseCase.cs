@@ -21,7 +21,7 @@ public class UpdateAnimeUseCase
 
     public async Task<AnimeDto> Execute(int id, UpdateAnimeDto updateAnimeDto)
     {
-        if (updateAnimeDto.Id != id) throw new BadRequestException("Id is not compatible with the request");
+        if (updateAnimeDto.Id != id) throw new BadRequestException("Id does not match.");
 
         var anime = await _animeService.GetAnime(id);
         if (anime is null) throw new NotFoundException("Anime not found");

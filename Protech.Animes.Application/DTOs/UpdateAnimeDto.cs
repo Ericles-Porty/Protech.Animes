@@ -4,7 +4,6 @@ namespace Protech.Animes.Application.DTOs;
 
 public class UpdateAnimeDto
 {
-    [Key]
     [Required(ErrorMessage = "Id is required")]
     public required int Id { get; set; }
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
+using Protech.Animes.Application.UseCases.DirectorUseCases;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
@@ -12,14 +13,24 @@ public class DirectorController : ControllerBase
 {
 
     private readonly IDirectorService _directorService;
+    private readonly DeleteDirectorUseCase _deleteDirectorUseCase;
     private readonly ILogger<DirectorController> _logger;
 
-    public DirectorController(IDirectorService directorService, ILogger<DirectorController> logger)
+    public DirectorController(
+        IDirectorService directorService,
+        DeleteDirectorUseCase deleteDirectorUseCase,
+        ILogger<DirectorController> logger
+        )
     {
-        _logger = logger;
         _directorService = directorService;
+        _deleteDirectorUseCase = deleteDirectorUseCase;
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Get all directors
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
     [Authorize]
@@ -41,6 +52,11 @@ public class DirectorController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get a director by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(DirectorDto), 200)]
     [ProducesResponseType(404)]
@@ -70,16 +86,21 @@ public class DirectorController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Create a director
+    /// </summary>
+    /// <param name="createDirectorDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(DirectorDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateDirector(DirectorDto directorDto)
+    public async Task<IActionResult> CreateDirector(CreateDirectorDto createDirectorDto)
     {
         try
         {
             _logger.LogInformation("CreateDirector called");
 
-            var director = await _directorService.CreateDirector(directorDto);
+            var director = await _directorService.CreateDirector(createDirectorDto);
 
             return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
         }
@@ -91,9 +112,15 @@ public class DirectorController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Delete a director by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
     public async Task<IActionResult> DeleteDirector(int id)
     {
         try
@@ -113,6 +140,14 @@ public class DirectorController : ControllerBase
 
             return NotFound();
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Director has animes associated with it. Cannot delete.");
+
+            var error = new { message = ex.Message };
+
+            return Conflict(error);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while deleting the director");
@@ -121,16 +156,22 @@ public class DirectorController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Update a director by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="updateDirectorDto"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(DirectorDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateDirector(int id, DirectorDto directorDto)
+    public async Task<IActionResult> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto)
     {
         try
         {
             _logger.LogInformation($"UpdateDirector called with id {id}");
 
-            var director = await _directorService.UpdateDirector(id, directorDto);
+            var director = await _directorService.UpdateDirector(id, updateDirectorDto);
 
             _logger.LogInformation($"Director with id {id} updated");
 
@@ -140,7 +181,9 @@ public class DirectorController : ControllerBase
         {
             _logger.LogWarning(ex, "Director not found");
 
-            return NotFound();
+            var error = new { message = ex.Message };
+
+            return NotFound(error);
         }
         catch (Exception ex)
         {
