@@ -1,54 +1,47 @@
 using AutoMapper;
 using Protech.Animes.Application.DTOs;
+using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Domain.Exceptions;
 using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 
 namespace Protech.Animes.Application.UseCases;
 
 public class CreateAnimeUseCase
 {
-    private readonly IAnimeRepository _animeRepository;
+    private readonly IAnimeService _animeService;
     private readonly IDirectorRepository _directorRepository;
     private readonly IMapper _mapper;
 
-    public CreateAnimeUseCase(IAnimeRepository animeRepository, IDirectorRepository directorRepository, IMapper mapper)
+    public CreateAnimeUseCase(IAnimeService animeService, IDirectorRepository directorRepository, IMapper mapper)
     {
-        _animeRepository = animeRepository;
+        _animeService = animeService;
         _directorRepository = directorRepository;
         _mapper = mapper;
     }
 
-    public async Task<AnimeDto> Execute(CreateAnimeDto animeDto)
+    public async Task<AnimeDto> Execute(CreateAnimeDto createAnimeDto)
     {
-        Director director;
+        var animeDto = _mapper.Map<AnimeDto>(createAnimeDto);
 
-        var existingDirector = await _directorRepository.GetByNameAsync(animeDto.DirectorName);
+        var animeAlreadyExists = await _animeService.GetAnimeByName(animeDto.Name);
 
+        if (animeAlreadyExists is not null) throw new DuplicatedEntityException("Anime", "Name");
 
-        if (existingDirector is not null)
+        Director? director = await _directorRepository.GetByNameAsync(animeDto.DirectorName);
+
+        if (director is null)
         {
-            director = existingDirector;
-        }
-        else
-        {
-            var directorDto = new DirectorDto { Name = animeDto.DirectorName };
+            var anime = await _animeService.CreateAnimeWithDirector(animeDto);
 
-            var mappedDirector = _mapper.Map<Director>(directorDto);
-
-            var createdDirector = await _directorRepository.CreateAsync(mappedDirector);
-
-            director = createdDirector;
+            return anime;
         }
 
+        animeDto.DirectorId = director.Id;
 
-        var anime = _mapper.Map<Anime>(animeDto);
-
-        anime.Director = director;
-
-        var createdAnime = await _animeRepository.CreateAsync(anime);
-
-        var createdAnimeDto = _mapper.Map<AnimeDto>(createdAnime);
+        var createdAnimeDto = await _animeService.CreateAnime(animeDto);
 
         return createdAnimeDto;
+
     }
 }
