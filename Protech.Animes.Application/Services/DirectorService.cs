@@ -18,17 +18,15 @@ public class DirectorService : IDirectorService
         _mapper = mapper;
     }
 
-    public async Task<DirectorDto> CreateDirector(DirectorDto directorDto)
+    public async Task<DirectorDto> CreateDirector(CreateDirectorDto createDirectorDto)
     {
-        Console.WriteLine("CreateDirector");
-        var director = _mapper.Map<Director>(directorDto);
+        var director = _mapper.Map<Director>(createDirectorDto);
 
         var createdDirector = await _directorRepository.CreateAsync(director);
 
-        var directorDtoCreated = _mapper.Map<DirectorDto>(createdDirector);
+        var directorDto = _mapper.Map<DirectorDto>(createdDirector);
 
-        Console.WriteLine("Director created");
-        return directorDtoCreated;
+        return directorDto;
     }
 
     public async Task<bool> DeleteDirector(int id)
@@ -39,7 +37,6 @@ public class DirectorService : IDirectorService
     public async Task<DirectorDto> GetDirector(int id)
     {
         var director = await _directorRepository.GetByIdAsync(id);
-
         if (director is null) throw new NotFoundException("Director not found");
 
         var directorDto = _mapper.Map<DirectorDto>(director);
@@ -50,18 +47,16 @@ public class DirectorService : IDirectorService
     public async Task<IEnumerable<DirectorDto>> GetDirectors()
     {
         var directors = await _directorRepository.GetAllAsync();
-
         var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
 
         return directorsDto;
     }
 
-    public async Task<DirectorDto> UpdateDirector(int id, DirectorDto directorDto)
+    public async Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto directorDto)
     {
         var director = _mapper.Map<Director>(directorDto);
-
+        
         var updatedDirector = await _directorRepository.UpdateAsync(id, director);
-
         if (updatedDirector is null) throw new NotFoundException("Director not found");
 
         var directorDtoUpdated = _mapper.Map<DirectorDto>(updatedDirector);
@@ -72,7 +67,6 @@ public class DirectorService : IDirectorService
     public async Task<DirectorDto> GetDirectorByName(string name)
     {
         var director = await _directorRepository.GetByNameAsync(name);
-
         if (director is null) throw new NotFoundException("Director not found");
 
         var directorDto = _mapper.Map<DirectorDto>(director);

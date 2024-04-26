@@ -10,9 +10,9 @@ public interface IDirectorService
 
     Task<DirectorDto> GetDirectorByName(string name);
 
-    Task<DirectorDto> CreateDirector(DirectorDto directorDto);
+    Task<DirectorDto> CreateDirector(CreateDirectorDto createDirectorDto);
 
-    Task<DirectorDto> UpdateDirector(int id, DirectorDto directorDto);
+    Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto);
 
     Task<bool> DeleteDirector(int id);
 }
