@@ -1,4 +1,5 @@
-using Protech.Animes.Application.UseCases;
+using Protech.Animes.Application.UseCases.Anime;
+using Protech.Animes.Application.UseCases.Auth;
 
 namespace Protech.Animes.API.Extensions.DependencyInjection;
 
@@ -11,7 +12,7 @@ public static class UseCasesDependenciesInjectionExtension
         services.AddScoped<LoginUserUseCase>();
         services.AddScoped<UpdateAnimeUseCase>();
         services.AddScoped<GetAnimesUseCase>();
-        
+
         return services;
     }
 }
