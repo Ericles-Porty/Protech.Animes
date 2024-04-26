@@ -14,7 +14,7 @@ public static class SeedingService
         var d5 = new Director { Id = 5, Name = "Katsuhiro Otomo" };
         var d6 = new Director { Id = 6, Name = "Satoshi Kon" };
         var d7 = new Director { Id = 7, Name = "Masaaki Yuasa" };
-        var d8 = new Director { Id = 8, Name = "Makoto Shinkai" };
+        var d8 = new Director { Id = 8, Name = "Makoto Shinkai 2" };
         var d9 = new Director { Id = 9, Name = "Hideaki Anno" };
         var d10 = new Director { Id = 10, Name = "Kunihiko Ikuhara" };
         var d11 = new Director { Id = 11, Name = "Mamoru Oshii" };
@@ -99,17 +99,13 @@ public static class SeedingService
             Director = d9
         };
 
-
         modelBuilder.Entity<Director>().HasData(
             d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15, d16, d17, d18
         );
 
-        // ensure created data 
-
-
-        // modelBuilder.Entity<Anime>().HasData(
-        //     a1, a2, a3, a4, a5, a6, a7, a8, a9
-        // );
+        modelBuilder.Entity<Anime>().HasData(
+            a1, a2, a3, a4, a5, a6, a7, a8, a9
+        );
 
     }
 }

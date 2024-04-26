@@ -21,7 +21,8 @@ public class ProtechAnimesDbContext : DbContext
         modelBuilder.Entity<Anime>()
             .HasOne(a => a.Director)
             .WithMany(d => d.Animes)
-            .HasForeignKey(a => a.DirectorId);
+            .HasForeignKey(a => a.DirectorId)
+            .IsRequired();
 
         modelBuilder.Entity<Anime>()
             .HasIndex(a => a.Name)
@@ -42,7 +43,7 @@ public class ProtechAnimesDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Id);
 
-        modelBuilder.SeedData();
+        // modelBuilder.SeedData();
 
     }
 
