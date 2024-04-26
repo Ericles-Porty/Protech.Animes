@@ -6,6 +6,18 @@ using Protech.Animes.Application.UseCases.Anime;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
+
+/// <summary>
+/// Controller for anime operations
+/// </summary>
+/// <response code="500">An error occurred while processing the request</response>
+/// <response code="404">The requested resource was not found</response>
+/// <response code="400">The request is invalid</response>
+/// <response code="201">The resource was created</response>
+/// <response code="204">The resource was deleted</response>
+/// <response code="200">The resource was found</response>
+/// <response code="401">Unauthorized</response>
+/// <response code="403">Forbidden</response>
 [ApiController]
 [Route("api/[controller]")]
 public class AnimeController : ControllerBase
@@ -46,8 +58,12 @@ public class AnimeController : ControllerBase
         _getAnimesBySummaryKeywordUseCase = getAnimesBySummaryKeywordUseCase;
     }
 
+    /// <summary>
+    /// Get all animes
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(typeof(ErrorModel), 500)]
     public async Task<IActionResult> GetAnimes([FromQuery] int? page, [FromQuery] int? pageSize)
     {
@@ -59,6 +75,14 @@ public class AnimeController : ControllerBase
 
             return Ok(animes);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while getting the animes");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+
+            return BadRequest(error);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes");
@@ -69,6 +93,14 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get an anime by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <response code="200">Returns the anime</response>
+    /// <response code="404">The requested resource was not found</response>
+    /// <response code="500">An error occurred while processing the request</response>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(AnimeDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
@@ -103,6 +135,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Create an anime
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(AnimeDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
@@ -137,6 +172,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Update an anime
+    /// </summary>
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(UpdateAnimeDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
@@ -188,6 +226,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Delete an anime by id
+    /// </summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
@@ -232,6 +273,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get animes by name
+    /// </summary>
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 500)]
@@ -263,6 +307,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get animes by director id
+    /// </summary>
     [HttpGet("director/{directorId}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 500)]
@@ -294,6 +341,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get animes by director name
+    /// </summary>
     [HttpGet("director/name/{directorName}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 500)]
@@ -325,6 +375,9 @@ public class AnimeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get animes by summary keyword
+    /// </summary>
     [HttpGet("summary/{keyword}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 500)]
