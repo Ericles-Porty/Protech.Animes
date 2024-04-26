@@ -17,6 +17,7 @@ public class AnimeController : ControllerBase
     private readonly GetAnimesUseCase _getAnimesUseCase;
     private readonly GetAnimeUseCase _getAnimeUsecase;
     private readonly DeleteAnimeUseCase _deleteAnimeUseCase;
+    private readonly GetAnimesByNameUseCase _getAnimesByNameUseCase;
 
     public AnimeController(
         ILogger<AnimeController> logger,
@@ -25,7 +26,8 @@ public class AnimeController : ControllerBase
         UpdateAnimeUseCase updateAnimeUseCase,
         GetAnimesUseCase getAnimesUseCase,
         GetAnimeUseCase getAnimeUsecase,
-        DeleteAnimeUseCase deleteAnimeUseCase
+        DeleteAnimeUseCase deleteAnimeUseCase,
+        GetAnimesByNameUseCase getAnimesByNameUseCase
         )
     {
         _logger = logger;
@@ -35,6 +37,7 @@ public class AnimeController : ControllerBase
         _getAnimesUseCase = getAnimesUseCase;
         _getAnimeUsecase = getAnimeUsecase;
         _deleteAnimeUseCase = deleteAnimeUseCase;
+        _getAnimesByNameUseCase = getAnimesByNameUseCase;
     }
 
     [HttpGet]
@@ -233,6 +236,29 @@ public class AnimeController : ControllerBase
             _logger.LogError(ex, "An error occurred while getting the animes by director");
 
             var error = new ErrorModel { Message = "An error occurred while getting the animes by director", StatusCode = 500 };
+
+            return StatusCode(500, error);
+        }
+    }
+
+    [HttpGet("name/{name}")]
+    [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 500)]
+    public async Task<IActionResult> GetAnimesByName(string name, [FromQuery] int? page, [FromQuery] int? pageSize)
+    {
+        try
+        {
+            _logger.LogInformation($"GetAnimesByName called with name {name}");
+
+            var animes = await _getAnimesByNameUseCase.Execute(name, page, pageSize);
+
+            return Ok(animes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by name");
+
+            var error = new ErrorModel { Message = "An error occurred while getting the animes by name", StatusCode = 500 };
 
             return StatusCode(500, error);
         }

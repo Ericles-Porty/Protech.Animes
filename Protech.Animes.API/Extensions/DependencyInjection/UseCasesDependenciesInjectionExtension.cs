@@ -13,6 +13,8 @@ public static class UseCasesDependenciesInjectionExtension
         services.AddScoped<UpdateAnimeUseCase>();
         services.AddScoped<GetAnimesUseCase>();
         services.AddScoped<GetAnimeUseCase>();
+        services.AddScoped<DeleteAnimeUseCase>();
+        services.AddScoped<GetAnimesByNameUseCase>();
 
         return services;
     }
