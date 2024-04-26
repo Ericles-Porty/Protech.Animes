@@ -19,6 +19,7 @@ public class AnimeController : ControllerBase
     private readonly GetAnimesByNameUseCase _getAnimesByNameUseCase;
     private readonly GetAnimesByDirectorUseCase _getAnimesByDirectorUseCase;
     private readonly GetAnimesByDirectorNameUseCase _getAnimesByDirectorNameUseCase;
+    private readonly GetAnimesBySummaryKeywordUseCase _getAnimesBySummaryKeywordUseCase;
 
     public AnimeController(
         ILogger<AnimeController> logger,
@@ -29,7 +30,8 @@ public class AnimeController : ControllerBase
         DeleteAnimeUseCase deleteAnimeUseCase,
         GetAnimesByNameUseCase getAnimesByNameUseCase,
         GetAnimesByDirectorUseCase getAnimesByDirectorUseCase,
-        GetAnimesByDirectorNameUseCase getAnimesByDirectorNameUseCase
+        GetAnimesByDirectorNameUseCase getAnimesByDirectorNameUseCase,
+        GetAnimesBySummaryKeywordUseCase getAnimesBySummaryKeywordUseCase
         )
     {
         _logger = logger;
@@ -41,6 +43,7 @@ public class AnimeController : ControllerBase
         _getAnimesByNameUseCase = getAnimesByNameUseCase;
         _getAnimesByDirectorUseCase = getAnimesByDirectorUseCase;
         _getAnimesByDirectorNameUseCase = getAnimesByDirectorNameUseCase;
+        _getAnimesBySummaryKeywordUseCase = getAnimesBySummaryKeywordUseCase;
     }
 
     [HttpGet]
@@ -211,6 +214,14 @@ public class AnimeController : ControllerBase
 
             return NotFound(error);
         }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while deleting the anime");
+
+            var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
+
+            return NotFound(error);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while deleting the anime");
@@ -309,6 +320,37 @@ public class AnimeController : ControllerBase
             _logger.LogError(ex, "An error occurred while getting the animes by director name");
 
             var error = new ErrorModel { Message = "An error occurred while getting the animes by director name", StatusCode = 500 };
+
+            return StatusCode(500, error);
+        }
+    }
+
+    [HttpGet("summary/{keyword}")]
+    [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 500)]
+    public async Task<IActionResult> GetAnimesBySummaryKeyword(string keyword, [FromQuery] int? page, [FromQuery] int? pageSize)
+    {
+        try
+        {
+            _logger.LogInformation($"GetAnimesBySummaryKeyword called with keyword {keyword}");
+
+            var animes = await _getAnimesBySummaryKeywordUseCase.ExecuteAsync(keyword, page, pageSize);
+
+            return Ok(animes);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by summary keyword");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+
+            return BadRequest(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the animes by summary keyword");
+
+            var error = new ErrorModel { Message = "An error occurred while getting the animes by summary keyword", StatusCode = 500 };
 
             return StatusCode(500, error);
         }

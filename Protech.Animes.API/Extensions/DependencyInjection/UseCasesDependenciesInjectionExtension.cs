@@ -17,6 +17,7 @@ public static class UseCasesDependenciesInjectionExtension
         services.AddScoped<GetAnimesByNameUseCase>();
         services.AddScoped<GetAnimesByDirectorUseCase>();
         services.AddScoped<GetAnimesByDirectorNameUseCase>();
+        services.AddScoped<GetAnimesBySummaryKeywordUseCase>();
 
         return services;
     }
