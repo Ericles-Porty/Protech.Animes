@@ -66,7 +66,7 @@ public class AnimeController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetAnimes([FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
@@ -74,7 +74,6 @@ public class AnimeController : ControllerBase
             _logger.LogInformation("GetAnimes called");
 
             var animes = await _getAnimesUseCase.Execute(page, pageSize);
-
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -82,16 +81,13 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while getting the animes");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes");
 
-            var error = new ErrorModel { Message = "An error occurred while getting the animes", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -103,7 +99,7 @@ public class AnimeController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(AnimeDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetAnime(int id)
     {
         try
@@ -121,16 +117,13 @@ public class AnimeController : ControllerBase
             _logger.LogWarning($"Anime with id {id} not found");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
-
-            return NotFound();
+            return NotFound(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the anime");
 
-            var error = new ErrorModel { Message = "An error occurred while getting the anime", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -140,7 +133,7 @@ public class AnimeController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(AnimeDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> CreateAnime(CreateAnimeDto animeDto)
     {
         try
@@ -158,16 +151,13 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while creating the anime");
 
             var error = new ErrorModel { Message = "Anime already exists", StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while creating the anime");
 
-            var error = new ErrorModel { Message = "An error occurred while creating the anime", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -178,7 +168,7 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(typeof(UpdateAnimeDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> UpdateAnime(int id, UpdateAnimeDto updateAnimeDto)
     {
         try
@@ -196,7 +186,6 @@ public class AnimeController : ControllerBase
             _logger.LogWarning($"Anime with id {id} not found");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
-
             return NotFound(error);
         }
         catch (BadRequestException ex)
@@ -204,7 +193,6 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while updating the anime");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (DuplicatedEntityException ex)
@@ -212,16 +200,13 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while updating the anime");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while updating the anime");
 
-            var error = new ErrorModel { Message = "An error occurred while updating the anime", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -231,7 +216,7 @@ public class AnimeController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> DeleteAnime(int id)
     {
         try
@@ -239,8 +224,6 @@ public class AnimeController : ControllerBase
             _logger.LogInformation($"DeleteAnime called with id {id}");
 
             var deleted = await _deleteAnimeUseCase.Execute(id);
-
-
             if (deleted is true)
             {
                 _logger.LogInformation($"Anime with id {id} deleted");
@@ -251,7 +234,6 @@ public class AnimeController : ControllerBase
             _logger.LogWarning($"Anime with id {id} could not be deleted");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
-
             return NotFound(error);
         }
         catch (NotFoundException ex)
@@ -259,16 +241,13 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while deleting the anime");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
-
             return NotFound(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while deleting the anime");
 
-            var error = new ErrorModel { Message = "An error occurred while deleting the anime", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -277,7 +256,7 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetAnimesByName(string name, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
@@ -285,7 +264,6 @@ public class AnimeController : ControllerBase
             _logger.LogInformation($"GetAnimesByName called with name {name}");
 
             var animes = await _getAnimesByNameUseCase.Execute(name, page, pageSize);
-
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -293,16 +271,13 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while getting the animes by name");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes by name");
 
-            var error = new ErrorModel { Message = "An error occurred while getting the animes by name", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -311,7 +286,7 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("director/{directorId}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetAnimesByDirector(int directorId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
@@ -319,7 +294,6 @@ public class AnimeController : ControllerBase
             _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
 
             var animes = await _getAnimesByDirectorUseCase.Execute(directorId, page, pageSize);
-
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -327,16 +301,13 @@ public class AnimeController : ControllerBase
             _logger.LogError(ex, "An error occurred while getting the animes by director");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 500 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes by director");
 
-            var error = new ErrorModel { Message = "An error occurred while getting the animes by director", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -345,7 +316,7 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("director/name/{directorName}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetAnimesByDirectorName(string directorName, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
@@ -353,7 +324,6 @@ public class AnimeController : ControllerBase
             _logger.LogInformation($"GetAnimesByDirectorName called with directorName {directorName}");
 
             var animes = await _getAnimesByDirectorNameUseCase.Execute(directorName, page, pageSize);
-
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -361,16 +331,13 @@ public class AnimeController : ControllerBase
             _logger.LogError(ex, "An error occurred while getting the animes by director name");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes by director name");
 
-            var error = new ErrorModel { Message = "An error occurred while getting the animes by director name", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 
@@ -379,7 +346,7 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("summary/{keyword}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
-    [ProducesResponseType(typeof(ErrorModel), 500)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> GetAnimesBySummaryKeyword(string keyword, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
@@ -387,7 +354,6 @@ public class AnimeController : ControllerBase
             _logger.LogInformation($"GetAnimesBySummaryKeyword called with keyword {keyword}");
 
             var animes = await _getAnimesBySummaryKeywordUseCase.ExecuteAsync(keyword, page, pageSize);
-
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -395,16 +361,13 @@ public class AnimeController : ControllerBase
             _logger.LogError(ex, "An error occurred while getting the animes by summary keyword");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-
             return BadRequest(error);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while getting the animes by summary keyword");
 
-            var error = new ErrorModel { Message = "An error occurred while getting the animes by summary keyword", StatusCode = 500 };
-
-            return StatusCode(500, error);
+            return StatusCode(500);
         }
     }
 }
