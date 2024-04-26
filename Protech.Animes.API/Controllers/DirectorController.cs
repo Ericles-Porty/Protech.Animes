@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Protech.Animes.API.Models;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Application.UseCases.DirectorUseCases;
@@ -44,7 +45,7 @@ public class DirectorController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> GetDirectors([FromQuery] int? page, [FromQuery] int? limit)
     {
@@ -53,7 +54,6 @@ public class DirectorController : ControllerBase
             _logger.LogInformation("GetDirectors called");
 
             var directors = await _getDirectorsUseCase.Execute(page, limit);
-
             return Ok(directors);
         }
         catch (ArgumentException ex)
@@ -61,7 +61,6 @@ public class DirectorController : ControllerBase
             _logger.LogWarning(ex, "Invalid page or limit");
 
             var error = new { message = ex.Message };
-
             return BadRequest(error);
         }
         catch (Exception ex)
@@ -77,7 +76,7 @@ public class DirectorController : ControllerBase
     /// </summary>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(DirectorDto), 200)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> GetDirector(int id)
     {
@@ -95,7 +94,8 @@ public class DirectorController : ControllerBase
         {
             _logger.LogWarning(ex, "Director not found");
 
-            return NotFound();
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
+            return NotFound(error);
         }
         catch (Exception ex)
         {
@@ -110,7 +110,7 @@ public class DirectorController : ControllerBase
     /// </summary>
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> GetDirectorsByName(string name, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
@@ -128,7 +128,8 @@ public class DirectorController : ControllerBase
         {
             _logger.LogWarning(ex, "Director not found");
 
-            return NotFound();
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
+            return NotFound(error);
         }
         catch (Exception ex)
         {
@@ -143,7 +144,7 @@ public class DirectorController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(DirectorDto), 201)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> CreateDirector(CreateDirectorDto createDirectorDto)
     {
@@ -160,7 +161,6 @@ public class DirectorController : ControllerBase
             _logger.LogWarning(ex, "Director already exists");
 
             var error = new { message = ex.Message };
-
             return BadRequest(error);
         }
         catch (Exception ex)
@@ -176,8 +176,8 @@ public class DirectorController : ControllerBase
     /// </summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(409)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
+    [ProducesResponseType(typeof(ErrorModel), 409)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> DeleteDirector(int id)
     {
@@ -196,16 +196,14 @@ public class DirectorController : ControllerBase
 
             _logger.LogWarning($"Director with id {id} could not be deleted");
 
-            var error = new { message = "Director not found" };
-
+            var error = new ErrorModel { Message = "Director not found", StatusCode = 404 };
             return NotFound(error);
         }
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "Director has animes associated with it. Cannot delete.");
 
-            var error = new { message = ex.Message };
-
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 409 };
             return Conflict(error);
         }
         catch (Exception ex)
@@ -221,8 +219,8 @@ public class DirectorController : ControllerBase
     /// </summary>
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(DirectorDto), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto)
     {
@@ -240,16 +238,14 @@ public class DirectorController : ControllerBase
         {
             _logger.LogWarning(ex, "Id does not match");
 
-            var error = new { message = ex.Message };
-
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
             return BadRequest(error);
         }
         catch (NotFoundException ex)
         {
             _logger.LogWarning(ex, "Director not found");
 
-            var error = new { message = ex.Message };
-
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
             return NotFound(error);
         }
         catch (Exception ex)
