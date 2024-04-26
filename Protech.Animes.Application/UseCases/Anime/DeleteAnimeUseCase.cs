@@ -8,12 +8,10 @@ public class DeleteAnimeUseCase
 {
 
     private readonly IAnimeService _animeService;
-    private readonly IMapper _mapper;
 
-    public DeleteAnimeUseCase(IAnimeService animeService, IMapper mapper)
+    public DeleteAnimeUseCase(IAnimeService animeService)
     {
         _animeService = animeService;
-        _mapper = mapper;
     }
 
     public async Task<bool> Execute(int id)
