@@ -10,6 +10,7 @@ public static class ServicesDependenciesInjectionExtension
         services.AddScoped<IDirectorService, DirectorService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<ICryptographyService, CryptographyService>();
 
         return services;
     }

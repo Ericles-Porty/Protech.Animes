@@ -9,18 +9,23 @@ public class LoginUserUseCase
 
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly ICryptographyService _cryptographyService;
 
-    public LoginUserUseCase(IUserService userService, IJwtTokenService jwtTokenService)
+    public LoginUserUseCase(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService)
     {
         _userService = userService;
         _jwtTokenService = jwtTokenService;
+        _cryptographyService = cryptographyService;
     }
 
     public async Task<UserDto> Execute(string email, string password)
     {
-        var user = await _userService.Login(email, password);
-
+        var user = await _userService.GetUserByEmail(email);
         if (user is null) throw new InvalidCredentialException("Invalid credentials.");
+
+        var userPassword = _cryptographyService.ConvertToString(user.Password);
+        var validPassword = _cryptographyService.Validate(password, userPassword);
+        if (!validPassword) throw new InvalidCredentialException("Invalid credentials.");
 
         var jwtToken = _jwtTokenService.GenerateToken(user);
 

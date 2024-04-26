@@ -5,6 +5,6 @@ namespace Protech.Animes.Infrastructure.Data.Repositories.Interfaces
     public interface IUserRepository
     {
         public Task<User> CreateAsync(User user);
-        public Task<User?> GetAsync(string email, string password);
+        public Task<User?> GetByEmailAsync(string email);
     }
 }
