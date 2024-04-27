@@ -25,7 +25,6 @@ public class CreateAnimeUseCase
         var animeDto = _mapper.Map<AnimeDto>(createAnimeDto);
 
         var animeAlreadyExists = await _animeService.GetAnimeByName(animeDto.Name);
-
         if (animeAlreadyExists is not null) throw new DuplicatedEntityException("Anime", "Name");
 
         Director? director = await _directorRepository.GetByNameAsync(animeDto.DirectorName);
@@ -33,12 +32,10 @@ public class CreateAnimeUseCase
         if (director is null)
         {
             var anime = await _animeService.CreateAnimeWithDirector(animeDto);
-
             return anime;
         }
 
         animeDto.DirectorId = director.Id;
-
         var createdAnimeDto = await _animeService.CreateAnime(animeDto);
 
         return createdAnimeDto;

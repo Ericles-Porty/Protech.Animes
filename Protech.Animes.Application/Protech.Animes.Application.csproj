@@ -1,16 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.0.3"/>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Protech.Animes.Infrastructure\Protech.Animes.Infrastructure.csproj"/>
-    <ProjectReference Include="..\Protech.Animes.Domain\Protech.Animes.Domain.csproj"/>
+    <ProjectReference Include="..\Protech.Animes.Domain\Protech.Animes.Domain.csproj" />
+    <ProjectReference Include="..\Protech.Animes.Infrastructure\Protech.Animes.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

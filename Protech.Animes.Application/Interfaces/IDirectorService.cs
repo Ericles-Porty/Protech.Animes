@@ -5,14 +5,18 @@ namespace Protech.Animes.Application.Interfaces;
 public interface IDirectorService
 {
     Task<IEnumerable<DirectorDto>> GetDirectors();
+    Task<IEnumerable<DirectorDto>> GetDirectorsPaginated(int page, int pageSize);
 
     Task<DirectorDto> GetDirector(int id);
 
-    Task<DirectorDto> GetDirectorByName(string name);
+    Task<DirectorDto?> GetDirectorByName(string name);
 
-    Task<DirectorDto> CreateDirector(DirectorDto directorDto);
+    Task<IEnumerable<DirectorDto>> GetDirectorsByNamePattern(string name);
+    Task<IEnumerable<DirectorDto>> GetDirectorsByNamePatternPaginated(string name, int page, int pageSize);
 
-    Task<DirectorDto> UpdateDirector(int id, DirectorDto directorDto);
+    Task<DirectorDto> CreateDirector(CreateDirectorDto createDirectorDto);
+
+    Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto);
 
     Task<bool> DeleteDirector(int id);
 }

@@ -18,9 +18,9 @@ public class UserService : IUserService
         return await _userRepository.CreateAsync(user);
     }
 
-    public async Task<User?> Login(string email, string password)
+    public async Task<User?> GetUserByEmail(string email)
     {
-        return await _userRepository.GetAsync(email, password);
+        return await _userRepository.GetByEmailAsync(email);
     }
 
 }

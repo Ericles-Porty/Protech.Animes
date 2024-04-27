@@ -16,7 +16,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Protech.Animes.Infrastructure\Protech.Animes.Infrastructure.csproj" />
     <ProjectReference Include="..\Protech.Animes.Application\Protech.Animes.Application.csproj" />
   </ItemGroup>
 

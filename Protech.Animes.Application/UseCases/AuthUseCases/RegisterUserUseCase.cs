@@ -9,23 +9,27 @@ public class RegisterUserUseCase
 {
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly ICryptographyService _cryptographyService;
 
-    public RegisterUserUseCase(IUserService userService, IJwtTokenService jwtTokenService)
+    public RegisterUserUseCase(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService)
     {
         _userService = userService;
         _jwtTokenService = jwtTokenService;
+        _cryptographyService = cryptographyService;
     }
 
     public async Task<UserDto> Execute(RegisterUserDto createdUserDto)
     {
         if (createdUserDto.Password != createdUserDto.ConfirmPassword) throw new BadRequestException("Passwords do not match");
 
+        var hashedPassword = _cryptographyService.Encrypt(createdUserDto.Password);
+        var hashedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(hashedPassword);
         var user = new User
         {
             Id = Guid.NewGuid(),
             Name = createdUserDto.Name,
             Email = createdUserDto.Email,
-            Password = createdUserDto.Password,
+            Password = hashedPasswordBytes
         };
 
         var createdUser = await _userService.Register(user);

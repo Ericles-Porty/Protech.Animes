@@ -12,8 +12,8 @@ using Protech.Animes.Infrastructure.Data.Contexts;
 namespace Protech.Animes.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ProtechAnimesDbContext))]
-    [Migration("20240425011524_AddUser")]
-    partial class AddUser
+    [Migration("20240426214400_createDatabase")]
+    partial class createDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,11 +88,12 @@ namespace Protech.Animes.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("bytea");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
                         .HasDefaultValue("User");

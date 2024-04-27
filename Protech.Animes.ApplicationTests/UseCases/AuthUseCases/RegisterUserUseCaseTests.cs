@@ -11,7 +11,6 @@ using Protech.Animes.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Protech.Animes.Application.UseCases.AuthUseCases.Tests;
@@ -23,6 +22,15 @@ public class RegisterUserUseCaseTests
     public void ExecuteTest()
     {
         // Arrange
+        IOptions<JwtConfig> jwtConfig = Options.Create(new JwtConfig
+        {
+            Secret = "fa9e3f36571b12d9ab882f76e5f8e30c3d3fcb7ec0968a8a519398e0b5125324",
+            Issuer = "Issuer",
+            Audience = "Audience",
+            DurationInHours = 1
+        });
+        var jwtTokenService = new JwtTokenService(jwtConfig);
+
         var userToRegister = new RegisterUserDto
         {
             Name = "John Doe",
@@ -31,32 +39,26 @@ public class RegisterUserUseCaseTests
             ConfirmPassword = "123456"
         };
 
+        var cryptographyService = new CryptographyService();
+        var encryptedPassword = cryptographyService.Encrypt(userToRegister.Password);
+        var encryptedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(encryptedPassword);
+
         var userEntity = new User
         {
             Id = Guid.NewGuid(),
             Name = userToRegister.Name,
             Email = userToRegister.Email,
-            Password = userToRegister.Password
+            Password = encryptedPasswordBytes
         };
 
-        IOptions<JwtConfig> jwtConfig = Options.Create(new JwtConfig
-        {
-            Secret = "fa9e3f36571b12d9ab882f76e5f8e30c3d3fcb7ec0968a8a519398e0b5125324",
-            Issuer = "Issuer",
-            Audience = "Audience",
-            DurationInHours = 1
-        });
 
-        var jwtTokenService = new JwtTokenService(jwtConfig);
         var token = jwtTokenService.GenerateToken(userEntity);
 
         var userServiceMock = new Mock<IUserService>();
         userServiceMock.Setup(x => x.Register(It.IsAny<User>())).ReturnsAsync(userEntity);
 
-        var jwtTokenServiceMock = new Mock<IJwtTokenService>();
-        jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns(token);
 
-        var useCase = new RegisterUserUseCase(userServiceMock.Object, jwtTokenServiceMock.Object);
+        var useCase = new RegisterUserUseCase(userServiceMock.Object, jwtTokenService, cryptographyService);
 
         // Act
         var result = useCase.Execute(userToRegister).Result;
@@ -72,7 +74,6 @@ public class RegisterUserUseCaseTests
         Assert.AreEqual(token, result.Token);
 
         userServiceMock.Verify(x => x.Register(It.IsAny<User>()), Times.Once);
-        jwtTokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()), Times.Once);
     }
 
     [TestMethod()]
@@ -88,9 +89,15 @@ public class RegisterUserUseCaseTests
         };
 
         var userServiceMock = new Mock<IUserService>();
-        var jwtTokenServiceMock = new Mock<IJwtTokenService>();
+        userServiceMock.Setup(x => x.Register(It.IsAny<User>())).Verifiable();
 
-        var useCase = new RegisterUserUseCase(userServiceMock.Object, jwtTokenServiceMock.Object);
+        var jwtTokenServiceMock = new Mock<IJwtTokenService>();
+        jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Verifiable();
+
+        var cryptographyServiceMock = new Mock<ICryptographyService>();
+        cryptographyServiceMock.Setup(x => x.Encrypt(It.IsAny<string>())).Verifiable();
+
+        var useCase = new RegisterUserUseCase(userServiceMock.Object, jwtTokenServiceMock.Object, cryptographyServiceMock.Object);
 
         // Act & Assert
         Assert.ThrowsExceptionAsync<BadRequestException>(() => useCase.Execute(userToRegister));
@@ -98,6 +105,9 @@ public class RegisterUserUseCaseTests
         // Assert
         userServiceMock.Verify(x => x.Register(It.IsAny<User>()), Times.Never);
         jwtTokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()), Times.Never);
+        cryptographyServiceMock.Verify(x => x.Encrypt(It.IsAny<string>()), Times.Never);
 
     }
+
+    
 }
