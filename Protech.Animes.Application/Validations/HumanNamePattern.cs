@@ -32,8 +32,9 @@ public class HumanNamePattern : ValidationAttribute
             {
                 return new ValidationResult("Name can not be empty.");
             }
+            var regex = new Regex(@"^[a-zA-ZÀ-ú\s-]+$", RegexOptions.None, TimeSpan.FromMilliseconds(250));
 
-            if (!Regex.IsMatch(name, @"^[a-zA-ZÀ-ú\s-]+$"))
+            if (!regex.IsMatch(name))
             {
                 return new ValidationResult("This isn't a valid name.");
             }
