@@ -14,7 +14,6 @@ public class HumanNamePattern : ValidationAttribute
             return new ValidationResult("Name is required.");
         }
 
-
         if (value is string name)
         {
             name = name.Trim();
@@ -34,12 +33,12 @@ public class HumanNamePattern : ValidationAttribute
                 return new ValidationResult("Name can not be empty.");
             }
 
-            if (!Regex.IsMatch(name, @"^[a-zA-ZÀ-ú\s-]+$")){
+            if (!Regex.IsMatch(name, @"^[a-zA-ZÀ-ú\s-]+$"))
+            {
                 return new ValidationResult("This isn't a valid name.");
             }
 
             return ValidationResult.Success!;
-
         }
 
         return new ValidationResult("Invalid name.");
