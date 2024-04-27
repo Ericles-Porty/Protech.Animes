@@ -16,12 +16,4 @@ public class UpdateAnimeDto
     [StringLength(2000, ErrorMessage = "Summary is too long")]
     [MinLength(3, ErrorMessage = "Summary is too short")]
     public required string Summary { get; set; }
-
-    [Required(ErrorMessage = "DirectorId is required")]
-    public required int DirectorId { get; set; }
-
-    [Required(ErrorMessage = "Director name is required")]
-    [StringLength(100, ErrorMessage = "Director name is too long")]
-    [MinLength(3, ErrorMessage = "Director name is too short")]
-    public required string DirectorName { get; set; }
 }

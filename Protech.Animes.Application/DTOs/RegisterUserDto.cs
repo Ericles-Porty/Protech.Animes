@@ -1,11 +1,14 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Protech.Animes.Application.Validations;
 
 namespace Protech.Animes.Application.DTOs;
 
 public class RegisterUserDto
 {
     [Required(ErrorMessage = "The Name is required")]
-    [StringLength(100, ErrorMessage = "The Name must have between 3 and 100 characters", MinimumLength = 3)]
+    [HumanNamePattern]
+    [DefaultValue("Ericles")]
     public required string Name { get; set; }
 
     [Required(ErrorMessage = "The Email is required")]

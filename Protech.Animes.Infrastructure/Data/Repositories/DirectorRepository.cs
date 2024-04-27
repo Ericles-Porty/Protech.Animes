@@ -64,7 +64,7 @@ public class DirectorRepository : IDirectorRepository
 
     public async Task<Director?> GetByNameAsync(string name)
     {
-        return await _dbContext.Directors.FirstOrDefaultAsync(d => d.Name.Contains(name));
+        return await _dbContext.Directors.FirstOrDefaultAsync(d => d.Name.ToLower() == name.ToLower());
     }
 
     public async Task<IEnumerable<Director>> GetAllPaginatedAsync(int page, int pageSize)
@@ -94,6 +94,6 @@ public class DirectorRepository : IDirectorRepository
     {
         return _dbContext.Directors
             .AsNoTracking()
-            .Where(d => EF.Functions.Like(d.Name, $"%{name}%"));
+            .Where(d => EF.Functions.Like(d.Name.ToLower(), $"%{name.ToLower()}%"));
     }
 }
