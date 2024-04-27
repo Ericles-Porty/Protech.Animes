@@ -8,17 +8,6 @@ using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
 
-/// <summary>
-/// Controller for anime operations
-/// </summary>
-/// <response code="500">An error occurred while processing the request</response>
-/// <response code="404">The requested resource was not found</response>
-/// <response code="400">The request is invalid</response>
-/// <response code="201">The resource was created</response>
-/// <response code="204">The resource was deleted</response>
-/// <response code="200">The resource was found</response>
-/// <response code="401">Unauthorized</response>
-/// <response code="403">Forbidden</response>
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]

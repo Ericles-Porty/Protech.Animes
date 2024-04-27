@@ -57,7 +57,6 @@ public class RegisterUserUseCaseTests
         var userServiceMock = new Mock<IUserService>();
         userServiceMock.Setup(x => x.Register(It.IsAny<User>())).ReturnsAsync(userEntity);
 
-
         var useCase = new RegisterUserUseCase(userServiceMock.Object, jwtTokenService, cryptographyService);
 
         // Act

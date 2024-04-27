@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Protech.Animes.Application.Validations;
 
 namespace Protech.Animes.Application.DTOs;
 
@@ -15,7 +16,6 @@ public class CreateAnimeDto
     public required string Summary { get; set; }
 
     [Required(ErrorMessage = "Director name is required")]
-    [StringLength(100, ErrorMessage = "Director name is too long")]
-    [MinLength(3, ErrorMessage = "Director name is too short")]
+    [HumanNamePattern]
     public required string DirectorName { get; set; }
 }

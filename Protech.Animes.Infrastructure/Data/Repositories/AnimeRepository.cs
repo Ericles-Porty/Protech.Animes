@@ -130,6 +130,7 @@ public class AnimeRepository : IAnimeRepository
     public async Task<IEnumerable<Anime>> GetAllPaginatedAsync(int page, int pageSize)
     {
         return await _dbContext.Animes
+            .Include(a => a.Director)
             .AsNoTracking()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -179,7 +180,7 @@ public class AnimeRepository : IAnimeRepository
     {
         return await _dbContext.Animes
             .AsNoTracking()
-            .SingleOrDefaultAsync(a => a.Name == name);
+            .SingleOrDefaultAsync(a => a.Name.ToLower() == name.ToLower());
     }
 
     public async Task<IEnumerable<Anime>> GetByNamePatternAsync(string name)

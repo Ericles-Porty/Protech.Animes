@@ -23,6 +23,5 @@ public class AnimeProfile : Profile
 
         CreateMap<CreateAnimeDto, AnimeDto>().ReverseMap();
 
-        CreateMap<UpdateAnimeDto, AnimeDto>().ReverseMap();
     }
 }

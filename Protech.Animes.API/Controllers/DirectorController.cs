@@ -47,18 +47,18 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetDirectors([FromQuery] int? page, [FromQuery] int? limit)
+    public async Task<IActionResult> GetDirectors([FromQuery] int? page, [FromQuery] int? pageSize)
     {
         try
         {
             _logger.LogInformation("GetDirectors called");
 
-            var directors = await _getDirectorsUseCase.Execute(page, limit);
+            var directors = await _getDirectorsUseCase.Execute(page, pageSize);
             return Ok(directors);
         }
         catch (ArgumentException ex)
         {
-            _logger.LogWarning(ex, "Invalid page or limit");
+            _logger.LogWarning(ex, "Invalid page or pageSize");
 
             var error = new { message = ex.Message };
             return BadRequest(error);
