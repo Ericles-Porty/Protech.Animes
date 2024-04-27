@@ -112,9 +112,9 @@ public class AnimeController : ControllerBase
 
             return Ok(anime);
         }
-        catch (NotFoundException)
+        catch (NotFoundException ex)
         {
-            _logger.LogWarning("Anime not found");
+            _logger.LogWarning(ex, "Anime not found");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
             return NotFound(error);
@@ -181,9 +181,9 @@ public class AnimeController : ControllerBase
 
             return Ok(updatedAnime);
         }
-        catch (NotFoundException)
+        catch (NotFoundException ex)
         {
-            _logger.LogWarning("Anime not found");
+            _logger.LogWarning(ex, "Anime not found");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
             return NotFound(error);
