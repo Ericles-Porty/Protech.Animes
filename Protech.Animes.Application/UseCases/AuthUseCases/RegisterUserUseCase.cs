@@ -23,7 +23,7 @@ public class RegisterUserUseCase
         if (createdUserDto.Password != createdUserDto.ConfirmPassword) throw new BadRequestException("Passwords do not match");
 
         var hashedPassword = _cryptographyService.Encrypt(createdUserDto.Password);
-        var hashedPasswordBytes = _cryptographyService.ConvertToBytes(hashedPassword);
+        var hashedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(hashedPassword);
         var user = new User
         {
             Id = Guid.NewGuid(),

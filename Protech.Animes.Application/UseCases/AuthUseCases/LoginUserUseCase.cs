@@ -23,9 +23,9 @@ public class LoginUserUseCase
         var user = await _userService.GetUserByEmail(email);
         if (user is null) throw new InvalidCredentialException("Invalid credentials.");
 
-        var userPassword = _cryptographyService.ConvertToString(user.Password);
-        var validPassword = _cryptographyService.Validate(password, userPassword);
-        if (!validPassword) throw new InvalidCredentialException("Invalid credentials.");
+        var userPassword = System.Text.Encoding.UTF8.GetString(user.Password);
+        var isValidPassword = _cryptographyService.Validate(password, userPassword);
+        if (!isValidPassword) throw new InvalidCredentialException("Invalid credentials.");
 
         var jwtToken = _jwtTokenService.GenerateToken(user);
 
