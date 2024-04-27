@@ -82,11 +82,11 @@ public class DirectorController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetDirector called with id {id}");
+            _logger.LogInformation("GetDirector called");
 
             var director = await _getDirectorUseCase.Execute(id);
 
-            _logger.LogInformation($"Director with id {id} found");
+            _logger.LogInformation("Director found");
 
             return Ok(director);
         }
@@ -116,11 +116,11 @@ public class DirectorController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetDirectorByName called with name {name}");
+            _logger.LogInformation("GetDirectorByName called");
 
             var director = await _getDirectorsByNameUseCase.Execute(name, page, pageSize);
 
-            _logger.LogInformation($"Director with name {name} found");
+            _logger.LogInformation("Director found");
 
             return Ok(director);
         }
@@ -183,18 +183,18 @@ public class DirectorController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"DeleteDirector called with id {id}");
+            _logger.LogInformation("DeleteDirector called");
 
             var deleted = await _deleteDirectorUseCase.Execute(id);
 
             if (deleted)
             {
-                _logger.LogInformation($"Director with id {id} deleted");
+                _logger.LogInformation("Director deleted");
 
                 return NoContent();
             }
 
-            _logger.LogWarning($"Director with id {id} could not be deleted");
+            _logger.LogWarning("Director could not be deleted");
 
             var error = new ErrorModel { Message = "Director not found", StatusCode = 404 };
             return NotFound(error);
@@ -226,11 +226,11 @@ public class DirectorController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"UpdateDirector called with id {id}");
+            _logger.LogInformation("UpdateDirector called");
 
             var director = await _updateDirectorUseCase.Execute(id, updateDirectorDto);
 
-            _logger.LogInformation($"Director with id {id} updated");
+            _logger.LogInformation("Director updated");
 
             return Ok(director);
         }

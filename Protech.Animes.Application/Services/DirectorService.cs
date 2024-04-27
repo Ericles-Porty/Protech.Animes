@@ -52,9 +52,9 @@ public class DirectorService : IDirectorService
         return directorsDto;
     }
 
-    public async Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto directorDto)
+    public async Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto)
     {
-        var director = _mapper.Map<Director>(directorDto);
+        var director = _mapper.Map<Director>(updateDirectorDto);
 
         var updatedDirector = await _directorRepository.UpdateAsync(id, director);
         if (updatedDirector is null) throw new NotFoundException("Director not found");

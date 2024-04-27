@@ -104,17 +104,17 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetAnime called with id {id}");
+            _logger.LogInformation("GetAnime called");
 
             var anime = await _getAnimeUsecase.Execute(id);
 
-            _logger.LogInformation($"Anime with id {id} found");
+            _logger.LogInformation("Anime found");
 
             return Ok(anime);
         }
         catch (NotFoundException)
         {
-            _logger.LogWarning($"Anime with id {id} not found");
+            _logger.LogWarning("Anime not found");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
             return NotFound(error);
@@ -173,17 +173,17 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"UpdateAnime called with id {id}");
+            _logger.LogInformation("UpdateAnime called");
 
             var updatedAnime = await _updateAnimeUseCase.Execute(id, updateAnimeDto);
 
-            _logger.LogInformation($"Anime with id {id} updated");
+            _logger.LogInformation("Anime updated");
 
             return Ok(updatedAnime);
         }
         catch (NotFoundException)
         {
-            _logger.LogWarning($"Anime with id {id} not found");
+            _logger.LogWarning("Anime not found");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
             return NotFound(error);
@@ -221,17 +221,17 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"DeleteAnime called with id {id}");
+            _logger.LogInformation("DeleteAnime called");
 
             var deleted = await _deleteAnimeUseCase.Execute(id);
             if (deleted is true)
             {
-                _logger.LogInformation($"Anime with id {id} deleted");
+                _logger.LogInformation("Anime deleted");
 
                 return NoContent();
             }
 
-            _logger.LogWarning($"Anime with id {id} could not be deleted");
+            _logger.LogWarning("Anime could not be deleted");
 
             var error = new ErrorModel { Message = "Anime not found", StatusCode = 404 };
             return NotFound(error);
@@ -261,7 +261,7 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetAnimesByName called with name {name}");
+            _logger.LogInformation("GetAnimesByName called");
 
             var animes = await _getAnimesByNameUseCase.Execute(name, page, pageSize);
             return Ok(animes);
@@ -291,7 +291,7 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetAnimesByDirector called with directorId {directorId}");
+            _logger.LogInformation("GetAnimesByDirector called");
 
             var animes = await _getAnimesByDirectorUseCase.Execute(directorId, page, pageSize);
             return Ok(animes);
@@ -321,7 +321,7 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetAnimesByDirectorName called with directorName {directorName}");
+            _logger.LogInformation("GetAnimesByDirectorName called");
 
             var animes = await _getAnimesByDirectorNameUseCase.Execute(directorName, page, pageSize);
             return Ok(animes);
@@ -351,7 +351,7 @@ public class AnimeController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"GetAnimesBySummaryKeyword called with keyword {keyword}");
+            _logger.LogInformation("GetAnimesBySummaryKeyword called");
 
             var animes = await _getAnimesBySummaryKeywordUseCase.ExecuteAsync(keyword, page, pageSize);
             return Ok(animes);
