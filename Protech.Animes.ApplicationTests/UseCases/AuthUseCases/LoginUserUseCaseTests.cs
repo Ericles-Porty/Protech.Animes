@@ -54,7 +54,7 @@ public class LoginUserUseCaseTests
         };
 
         var userServiceMock = new Mock<IUserService>();
-        userServiceMock.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(userEntity);
+        userServiceMock.Setup(x => x.GetByEmail(It.IsAny<string>())).ReturnsAsync(userEntity);
 
         var jwtTokenServiceMock = new Mock<IJwtTokenService>();
         jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns(token);
@@ -70,7 +70,7 @@ public class LoginUserUseCaseTests
         Assert.AreEqual(userDto.Email, result.Email);
         Assert.AreEqual(userDto.Token, result.Token);
 
-        userServiceMock.Verify(x => x.GetUserByEmail(It.IsAny<string>()), Times.Once);
+        userServiceMock.Verify(x => x.GetByEmail(It.IsAny<string>()), Times.Once);
         jwtTokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()), Times.Once);
 
     }
@@ -88,7 +88,7 @@ public class LoginUserUseCaseTests
         User? user = null;
 
         var userServiceMock = new Mock<IUserService>();
-        userServiceMock.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(user);
+        userServiceMock.Setup(x => x.GetByEmail(It.IsAny<string>())).ReturnsAsync(user);
 
         var jwtTokenServiceMock = new Mock<IJwtTokenService>();
         jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Verifiable();
@@ -101,7 +101,7 @@ public class LoginUserUseCaseTests
         // Act & Assert
         Assert.ThrowsExceptionAsync<InvalidCredentialException>(() => useCase.Execute(loginUserDto.Email, loginUserDto.Password));
 
-        userServiceMock.Verify(x => x.GetUserByEmail(It.IsAny<string>()), Times.Once);
+        userServiceMock.Verify(x => x.GetByEmail(It.IsAny<string>()), Times.Once);
         jwtTokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()), Times.Never);
         cryptographyServiceMock.Verify(x => x.Encrypt(It.IsAny<string>()), Times.Never);
     }
@@ -131,7 +131,7 @@ public class LoginUserUseCaseTests
         };
 
         var userServiceMock = new Mock<IUserService>();
-        userServiceMock.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(userEntity);
+        userServiceMock.Setup(x => x.GetByEmail(It.IsAny<string>())).ReturnsAsync(userEntity);
 
         var jwtTokenServiceMock = new Mock<IJwtTokenService>();
         jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Verifiable();
@@ -141,7 +141,7 @@ public class LoginUserUseCaseTests
         // Act & Assert
         Assert.ThrowsExceptionAsync<InvalidCredentialException>(() => useCase.Execute(loginUserDto.Email, loginUserDto.Password));
 
-        userServiceMock.Verify(x => x.GetUserByEmail(It.IsAny<string>()), Times.Once);
+        userServiceMock.Verify(x => x.GetByEmail(It.IsAny<string>()), Times.Once);
         jwtTokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()), Times.Never);
 
 

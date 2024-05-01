@@ -6,6 +6,6 @@ public interface IUserService
 {
     Task<User> Register(User user);
 
-    Task<User?> GetUserByEmail(string email);
+    Task<User?> GetByEmail(string email);
 
 }

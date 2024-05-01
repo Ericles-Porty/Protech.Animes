@@ -1,8 +1,9 @@
 using System.Security.Authentication;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
+using Protech.Animes.Application.Commands;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.UseCases.AuthUseCases;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
@@ -11,21 +12,17 @@ namespace Protech.Animes.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-
-    private readonly RegisterUserUseCase _registerUserUseCase;
-    private readonly LoginUserUseCase _loginUserUseCase;
     private readonly ILogger<AuthController> _logger;
+    private readonly IMediator _mediator;
 
 
     public AuthController(
-        RegisterUserUseCase RegisterUserUseCase,
-        LoginUserUseCase LoginUserUseCase,
-        ILogger<AuthController> logger
+        ILogger<AuthController> logger,
+        IMediator mediator
         )
     {
-        _registerUserUseCase = RegisterUserUseCase;
-        _loginUserUseCase = LoginUserUseCase;
         _logger = logger;
+        _mediator = mediator;
     }
 
     /// <summary>
@@ -41,7 +38,7 @@ public class AuthController : ControllerBase
         {
             _logger.LogInformation("Register user called");
 
-            var user = await _registerUserUseCase.Execute(registerUserDto);
+            var user = await _mediator.Send(new RegisterUserCommand(registerUserDto));
 
             _logger.LogInformation("User registered");
 
@@ -52,6 +49,13 @@ public class AuthController : ControllerBase
             _logger.LogWarning(ex, "Bad request");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (DuplicatedEntityException)
+        {
+            _logger.LogWarning("Duplicated entity");
+
+            var error = new ErrorModel { Message = "User already exists", StatusCode = 400 };
             return BadRequest(error);
         }
         catch (Exception ex)
@@ -75,11 +79,11 @@ public class AuthController : ControllerBase
         {
             _logger.LogInformation("Login user called");
 
-            var userWithToken = await _loginUserUseCase.Execute(loginUserDto.Email, loginUserDto.Password);
+            var user = await _mediator.Send(new LoginUserCommand(loginUserDto));
 
             _logger.LogInformation("User logged in");
 
-            return Ok(userWithToken);
+            return Ok(user);
         }
         catch (InvalidCredentialException ex)
         {

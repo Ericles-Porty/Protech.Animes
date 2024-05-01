@@ -1,42 +1,45 @@
+using MediatR;
+using Protech.Animes.Application.Commands;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
 
-namespace Protech.Animes.Application.UseCases.AuthUseCases;
+namespace Protech.Animes.Application.Handlers;
 
-public class RegisterUserUseCase
+public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
 {
+
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ICryptographyService _cryptographyService;
 
-    public RegisterUserUseCase(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService)
+    public RegisterUserHandler(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService)
     {
         _userService = userService;
         _jwtTokenService = jwtTokenService;
         _cryptographyService = cryptographyService;
     }
 
-    [Obsolete("Using command and handler pattern.")]
-    public async Task<UserDto> Execute(RegisterUserDto createdUserDto)
+    public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        if (createdUserDto.Password != createdUserDto.ConfirmPassword) throw new BadRequestException("Passwords do not match");
+        if (request.RegisterUserDto.Password != request.RegisterUserDto.ConfirmPassword) throw new BadRequestException("Passwords do not match");
 
-        var hashedPassword = _cryptographyService.Encrypt(createdUserDto.Password);
+        var userExists = await _userService.GetByEmail(request.RegisterUserDto.Email);
+        if (userExists is not null) throw new DuplicatedEntityException("User already exists");
+
+        var hashedPassword = _cryptographyService.Encrypt(request.RegisterUserDto.Password);
         var hashedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(hashedPassword);
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Name = createdUserDto.Name,
-            Email = createdUserDto.Email,
+            Name = request.RegisterUserDto.Name,
+            Email = request.RegisterUserDto.Email,
             Password = hashedPasswordBytes
         };
 
         var createdUser = await _userService.Register(user);
-
         var jwtToken = _jwtTokenService.GenerateToken(createdUser);
-
         var userDto = new UserDto
         {
             Name = createdUser.Name,

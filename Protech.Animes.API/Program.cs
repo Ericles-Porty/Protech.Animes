@@ -5,7 +5,6 @@ using Protech.Animes.API.Extensions.Auth.JWT;
 using Protech.Animes.API.Extensions.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var connectionString = builder.Configuration.GetConnectionString("ProtechAnimeDbConnection");
 
 #region Services
@@ -22,7 +21,7 @@ SwaggerDefinitionExtensions.AddSwaggerDefinition(builder.Services);
 JwtAuthenticationExtensions.AddJwtAuthentication(builder.Services, builder.Configuration);
 
 builder.Services.AddControllers();
-
+builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 #endregion
 
