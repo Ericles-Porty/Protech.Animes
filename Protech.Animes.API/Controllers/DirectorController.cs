@@ -32,13 +32,14 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetDirectors([FromQuery] GetDirectorsQuery getDirectorsQuery)
+    public async Task<IActionResult> GetDirectors([FromQuery] PaginationParams paginationParams)
     {
         try
         {
             _logger.LogInformation("GetDirectors called");
 
-            var directors = await _mediator.Send(getDirectorsQuery);
+
+            var directors = await _mediator.Send(new GetDirectorsQuery(paginationParams));
             return Ok(directors);
         }
         catch (ArgumentException ex)
@@ -97,39 +98,39 @@ public class DirectorController : ControllerBase
         }
     }
 
-    // /// <summary>
-    // /// Get directors by name pattern
-    // /// </summary>
-    // [HttpGet("name/{name}")]
-    // [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
-    // [ProducesResponseType(typeof(ErrorModel), 404)]
-    // [ProducesResponseType(500)]
-    // public async Task<IActionResult> GetDirectorsByName(string name, [FromQuery] int? page, [FromQuery] int? pageSize)
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("GetDirectorByName called");
+    /// <summary>
+    /// Get directors by name pattern
+    /// </summary>
+    [HttpGet("name/{name}")]
+    [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> GetDirectorsByName(string name, [FromQuery] PaginationParams paginationParams)
+    {
+        try
+        {
+            _logger.LogInformation("GetDirectorByName called");
 
-    //         var director = await _getDirectorsByNameUseCase.Execute(name, page, pageSize);
+            var director = await _mediator.Send(new GetDirectorsByNameQuery(name, paginationParams));
 
-    //         _logger.LogInformation("Director found");
+            _logger.LogInformation("Director found");
 
-    //         return Ok(director);
-    //     }
-    //     catch (NotFoundException ex)
-    //     {
-    //         _logger.LogWarning(ex, "Director not found");
+            return Ok(director);
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Director not found");
 
-    //         var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
-    //         return NotFound(error);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "An error occurred while getting the director");
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
+            return NotFound(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the director");
 
-    //         return StatusCode(500);
-    //     }
-    // }
+            return StatusCode(500);
+        }
+    }
 
     // /// <summary>
     // /// Create a director

@@ -6,22 +6,22 @@ using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.CQRS.Queries.DirectorQueries.Handlers;
 
-public class GetDirectorsHandler : IRequestHandler<GetDirectorsQuery, IEnumerable<DirectorDto>>
+public class GetDirectorsByNameHandler : IRequestHandler<GetDirectorsByNameQuery, IEnumerable<DirectorDto>>
 {
     private readonly IMapper _mapper;
     private readonly IDirectorService _directorService;
 
-    public GetDirectorsHandler(IDirectorService directorService, IMapper mapper)
+    public GetDirectorsByNameHandler(IDirectorService directorService, IMapper mapper)
     {
         _directorService = directorService;
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<DirectorDto>> Handle(GetDirectorsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<DirectorDto>> Handle(GetDirectorsByNameQuery request, CancellationToken cancellationToken)
     {
         if (!request.PaginationParams.Page.HasValue || !request.PaginationParams.PageSize.HasValue)
         {
-            var directors = await _directorService.GetDirectors();
+            var directors = await _directorService.GetDirectorsByNamePattern(request.Name);
             var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
             return directorsDto;
         }
