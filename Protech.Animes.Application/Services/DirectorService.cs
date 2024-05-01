@@ -56,7 +56,7 @@ public class DirectorService : IDirectorService
     {
         var director = _mapper.Map<Director>(updateDirectorDto);
 
-        var updatedDirector = await _directorRepository.UpdateAsync(id, director);
+        var updatedDirector = await _directorRepository.UpdateAsync(director);
         if (updatedDirector is null) throw new NotFoundException("Director not found");
 
         var directorDtoUpdated = _mapper.Map<DirectorDto>(updatedDirector);

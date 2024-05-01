@@ -7,26 +7,23 @@ using Microsoft.EntityFrameworkCore;
 using Protech.Animes.Infrastructure.Data.Contexts;
 using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Domain.Exceptions;
 
-public class AnimeRepository : IAnimeRepository
+public class AnimeRepository(ProtechAnimesDbContext dbContext) : BaseRepository<Anime, int>(dbContext), IAnimeRepository
 {
+    private readonly ProtechAnimesDbContext _dbContext = dbContext;
 
-    private readonly ProtechAnimesDbContext _dbContext;
-
-    public AnimeRepository(ProtechAnimesDbContext dbContext)
+    public override async Task<Anime> CreateAsync(Anime anime)
     {
-        _dbContext = dbContext;
-    }
-
-    public async Task<Anime> CreateAsync(Anime entity)
-    {
-        await _dbContext.Animes.AddAsync(entity);
-
+        var director = await _dbContext.Directors.FindAsync(anime.DirectorId);
+        if (director is null) throw new NotFoundException("The director does not exist");
+        
+        await _dbContext.Animes.AddAsync(anime);
         await _dbContext.SaveChangesAsync();
-
-        return entity;
+        return anime;
     }
 
+    [Obsolete("This method is obsolete, use CreateAsync instead")]
     public async Task<Anime?> CreateAnimeWithDirectorAsync(Anime anime, Director director)
     {
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
@@ -51,32 +48,6 @@ public class AnimeRepository : IAnimeRepository
         }
 
         return anime;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var anime = await GetByIdAsync(id);
-
-        if (anime is null) return false;
-
-        _dbContext.Animes.Remove(anime);
-
-        await _dbContext.SaveChangesAsync();
-
-        return true;
-    }
-
-    public async Task<IEnumerable<Anime>> GetAllAsync()
-    {
-        return await _dbContext.Animes
-            .Include(a => a.Director)
-            .AsNoTracking()
-            .ToListAsync();
-    }
-
-    public async Task<Anime?> GetByIdAsync(int id)
-    {
-        return await _dbContext.Animes.FindAsync(id);
     }
 
     public async Task<Anime?> GetByIdIncludingDirectorAsync(int id)
@@ -129,12 +100,11 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<IEnumerable<Anime>> GetAllPaginatedAsync(int page, int pageSize)
     {
-        return await _dbContext.Animes
+        var query = _dbContext.Animes
             .Include(a => a.Director)
-            .AsNoTracking()
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+            .AsNoTracking();
+
+        return await Paginate(query, page, pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<Anime>> GetByDirectorIdAsync(int directorId)
@@ -144,10 +114,7 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<IEnumerable<Anime>> GetByDirectorIdPaginatedAsync(int directorId, int page, int pageSize)
     {
-        return await GetByDirectorIdQuery(directorId)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        return await Paginate(GetByDirectorIdQuery(directorId), page, pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<Anime>> GetByDirectorNameAsync(string directorName)
@@ -157,10 +124,7 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<IEnumerable<Anime>> GetByDirectorNamePaginatedAsync(string directorName, int page, int pageSize)
     {
-        return await FilterByDirectorName(directorName)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        return await Paginate(FilterByDirectorName(directorName), page, pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<Anime>> GetByKeywordSummaryAsync(string keyword)
@@ -170,10 +134,7 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<IEnumerable<Anime>> GetByKeywordSummaryPaginatedAsync(string keyword, int page, int pageSize)
     {
-        return await FilterBySummaryKeyword(keyword)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        return await Paginate(FilterBySummaryKeyword(keyword), page, pageSize).ToListAsync();
     }
 
     public async Task<Anime?> GetByNameAsync(string name)
@@ -190,10 +151,7 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<IEnumerable<Anime>> GetByNamePatternPaginatedAsync(string name, int page, int pageSize)
     {
-        return await FilterByNamePattern(name)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        return await Paginate(FilterByNamePattern(name), page, pageSize).ToListAsync();
     }
 
     private IQueryable<Anime> GetByDirectorIdQuery(int directorId)

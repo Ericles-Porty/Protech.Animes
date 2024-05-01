@@ -5,62 +5,9 @@ using Protech.Animes.Domain.Entities;
 
 namespace Protech.Animes.Infrastructure.Data.Repositories;
 
-public class DirectorRepository : IDirectorRepository
+public class DirectorRepository(ProtechAnimesDbContext dbContext) : BaseRepository<Director, int>(dbContext), IDirectorRepository
 {
-
-    private readonly ProtechAnimesDbContext _dbContext;
-
-    public DirectorRepository(ProtechAnimesDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task<Director> CreateAsync(Director entity)
-    {
-        await _dbContext.Directors.AddAsync(entity);
-
-        await _dbContext.SaveChangesAsync();
-
-        return entity;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var director = await _dbContext.Directors.FindAsync(id);
-
-        if (director is null) return false;
-
-        _dbContext.Directors.Remove(director);
-        await _dbContext.SaveChangesAsync();
-
-        return true;
-    }
-
-    public async Task<IEnumerable<Director>> GetAllAsync()
-    {
-        return await _dbContext.Directors
-            .AsNoTracking()
-            .ToListAsync();
-    }
-
-    public async Task<Director?> GetByIdAsync(int id)
-    {
-        return await _dbContext.Directors.FindAsync(id);
-    }
-
-
-    public async Task<Director?> UpdateAsync(int id, Director entity)
-    {
-        var director = await GetByIdAsync(id);
-
-        if (director is null) return null;
-
-        director.Name = entity.Name;
-
-        await _dbContext.SaveChangesAsync();
-
-        return director;
-    }
+    private readonly ProtechAnimesDbContext _dbContext = dbContext;
 
     public async Task<Director?> GetByNameAsync(string name)
     {
@@ -69,11 +16,8 @@ public class DirectorRepository : IDirectorRepository
 
     public async Task<IEnumerable<Director>> GetAllPaginatedAsync(int page, int pageSize)
     {
-        return await _dbContext.Directors
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .AsNoTracking()
-            .ToListAsync();
+        var query = _dbContext.Directors.AsNoTracking();
+        return await Paginate(query, page, pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<Director>> GetByNamePatternAsync(string name)
@@ -83,17 +27,13 @@ public class DirectorRepository : IDirectorRepository
 
     public async Task<IEnumerable<Director>> GetByNamePatternPaginatedAsync(string name, int page, int pageSize)
     {
-        return await FilterDirectorsByNamePattern(name)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .AsNoTracking()
-            .ToListAsync();
+        return await Paginate(FilterDirectorsByNamePattern(name), page, pageSize).ToListAsync();
     }
 
     private IQueryable<Director> FilterDirectorsByNamePattern(string name)
     {
         return _dbContext.Directors
             .AsNoTracking()
-            .Where(d => EF.Functions.Like(d.Name.ToLower(), $"%{name.ToLower()}%"));
+            .Where(d => EF.Functions.ILike(d.Name, $"%{name}%"));
     }
 }

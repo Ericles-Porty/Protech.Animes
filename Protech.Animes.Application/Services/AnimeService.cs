@@ -167,7 +167,7 @@ public class AnimeService : IAnimeService
     {
         var anime = _mapper.Map<Anime>(animeDto);
 
-        var updatedAnime = await _animeRepository.UpdateAsync(id, anime);
+        var updatedAnime = await _animeRepository.UpdateAsync(anime);
 
         if (updatedAnime is null) throw new NotFoundException("Anime not found");
 

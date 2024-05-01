@@ -2,7 +2,7 @@ namespace Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 
 using Protech.Animes.Domain.Entities;
 
-public interface IAnimeRepository : IBaseRepository<Anime>
+public interface IAnimeRepository : IBaseRepository<Anime, int>
 {
     Task<Anime?> GetByNameAsync(string name);
 
