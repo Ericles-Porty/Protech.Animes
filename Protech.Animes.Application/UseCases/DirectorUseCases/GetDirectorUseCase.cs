@@ -1,19 +1,19 @@
-using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
+// using Protech.Animes.Application.DTOs;
+// using Protech.Animes.Application.Interfaces;
 
-namespace Protech.Animes.Application.UseCases.DirectorUseCases;
+// namespace Protech.Animes.Application.UseCases.DirectorUseCases;
 
-public class GetDirectorUseCase
-{
+// public class GetDirectorUseCase
+// {
 
-    private readonly IDirectorService _directorService;
+//     private readonly IDirectorService _directorService;
 
-    public GetDirectorUseCase(IDirectorService directorService)
-    {
-        _directorService = directorService;
-    }
+//     public GetDirectorUseCase(IDirectorService directorService)
+//     {
+//         _directorService = directorService;
+//     }
 
-    public async Task<DirectorDto> Execute(int id) =>
-        await _directorService.GetDirector(id);
+//     public async Task<DirectorDto> Execute(int id) =>
+//         await _directorService.GetDirector(id);
         
-}
+// }

@@ -12,7 +12,7 @@ builder.Services.AddDbContext<ProtechAnimesDbContext>(options => options.UseNpgs
 
 RepositoryDependenciesInjectionExtension.AddRepositoryDependencies(builder.Services);
 ServicesDependenciesInjectionExtension.AddServicesDependencies(builder.Services);
-UseCasesDependenciesInjectionExtension.AddUseCases(builder.Services);
+// UseCasesDependenciesInjectionExtension.AddUseCases(builder.Services);
 JwtConfigDependenciesInjectionExtension.AddJwtConfigDependencies(builder.Services, builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();

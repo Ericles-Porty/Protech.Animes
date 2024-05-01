@@ -1,4 +1,4 @@
-using Protech.Animes.Application.Interfaces;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.Services;
 

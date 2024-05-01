@@ -1,15 +1,13 @@
 using MediatR;
-using Protech.Animes.Application.Commands;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
+using Protech.Animes.Domain.Interfaces.Services;
 
-namespace Protech.Animes.Application.Handlers;
+namespace Protech.Animes.Application.CQRS.Commands.UserCommands.Handlers;
 
 public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
 {
-
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ICryptographyService _cryptographyService;
@@ -23,18 +21,18 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
 
     public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        if (request.RegisterUserDto.Password != request.RegisterUserDto.ConfirmPassword) throw new BadRequestException("Passwords do not match");
+        if (request.Password != request.ConfirmPassword) throw new BadRequestException("Passwords do not match");
 
-        var userExists = await _userService.GetByEmail(request.RegisterUserDto.Email);
+        var userExists = await _userService.GetByEmail(request.Email);
         if (userExists is not null) throw new DuplicatedEntityException("User already exists");
 
-        var hashedPassword = _cryptographyService.Encrypt(request.RegisterUserDto.Password);
+        var hashedPassword = _cryptographyService.Encrypt(request.Password);
         var hashedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(hashedPassword);
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Name = request.RegisterUserDto.Name,
-            Email = request.RegisterUserDto.Email,
+            Name = request.Name,
+            Email = request.Email,
             Password = hashedPasswordBytes
         };
 

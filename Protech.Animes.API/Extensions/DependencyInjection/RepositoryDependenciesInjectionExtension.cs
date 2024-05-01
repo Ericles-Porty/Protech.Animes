@@ -1,5 +1,5 @@
+using Protech.Animes.Domain.Interfaces.Repositories;
 using Protech.Animes.Infrastructure.Data.Repositories;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 
 namespace Protech.Animes.API.Extensions.DependencyInjection;
 

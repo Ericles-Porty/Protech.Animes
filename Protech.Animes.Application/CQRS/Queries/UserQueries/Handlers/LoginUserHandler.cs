@@ -1,14 +1,12 @@
-using System.Security.Authentication;
 using MediatR;
-using Protech.Animes.Application.Commands;
+using System.Security.Authentication;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
+using Protech.Animes.Domain.Interfaces.Services;
 
-namespace Protech.Animes.Application.Handlers;
+namespace Protech.Animes.Application.CQRS.Queries.UserQueries.Handlers;
 
-public class LoginUserHandler : IRequestHandler<LoginUserCommand, UserDto>
+public class LoginUserHandler : IRequestHandler<LoginUserQuery, UserDto>
 {
-
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ICryptographyService _cryptographyService;
@@ -20,17 +18,16 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, UserDto>
         _cryptographyService = cryptographyService;
     }
 
-    public async Task<UserDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<UserDto> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
-        var user = await _userService.GetByEmail(request.LoginUserDto.Email);
+        var user = await _userService.GetByEmail(request.Email);
         if (user is null) throw new InvalidCredentialException("Invalid credentials.");
 
         var userPassword = System.Text.Encoding.UTF8.GetString(user.Password);
-        var isValidPassword = _cryptographyService.Validate(request.LoginUserDto.Password, userPassword);
+        var isValidPassword = _cryptographyService.Validate(request.Password, userPassword);
         if (!isValidPassword) throw new InvalidCredentialException("Invalid credentials.");
 
         var jwtToken = _jwtTokenService.GenerateToken(user);
-
         var userDto = new UserDto
         {
             Name = user.Name,

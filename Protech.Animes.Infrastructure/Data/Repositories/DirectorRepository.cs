@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Protech.Animes.Infrastructure.Data.Contexts;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Domain.Interfaces.Repositories;
 
 namespace Protech.Animes.Infrastructure.Data.Repositories;
 

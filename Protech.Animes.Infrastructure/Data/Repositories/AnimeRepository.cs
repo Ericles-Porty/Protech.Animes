@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Protech.Animes.Infrastructure.Data.Contexts;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
+using Protech.Animes.Domain.Interfaces.Repositories;
 
 public class AnimeRepository(ProtechAnimesDbContext dbContext) : BaseRepository<Anime, int>(dbContext), IAnimeRepository
 {

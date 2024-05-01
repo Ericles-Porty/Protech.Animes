@@ -1,26 +1,26 @@
-using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Domain.Exceptions;
+// using Protech.Animes.Application.Interfaces;
+// using Protech.Animes.Domain.Exceptions;
 
-namespace Protech.Animes.Application.UseCases.AnimeUseCases;
+// namespace Protech.Animes.Application.UseCases.AnimeUseCases;
 
-public class DeleteAnimeUseCase
-{
+// public class DeleteAnimeUseCase
+// {
 
-    private readonly IAnimeService _animeService;
+//     private readonly IAnimeService _animeService;
 
-    public DeleteAnimeUseCase(IAnimeService animeService)
-    {
-        _animeService = animeService;
-    }
+//     public DeleteAnimeUseCase(IAnimeService animeService)
+//     {
+//         _animeService = animeService;
+//     }
 
-    public async Task<bool> Execute(int id)
-    {
-        var anime = await _animeService.GetAnime(id);
+//     public async Task<bool> Execute(int id)
+//     {
+//         var anime = await _animeService.GetAnime(id);
 
-        if (anime is null) throw new NotFoundException("Anime not found");
+//         if (anime is null) throw new NotFoundException("Anime not found");
 
-        var deleted = await _animeService.DeleteAnime(id);
+//         var deleted = await _animeService.DeleteAnime(id);
 
-        return deleted;
-    }
-}
+//         return deleted;
+//     }
+// }

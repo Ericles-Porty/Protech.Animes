@@ -1,6 +1,6 @@
-namespace Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
-
 using Protech.Animes.Domain.Entities;
+
+namespace Protech.Animes.Domain.Interfaces.Repositories;
 
 public interface IAnimeRepository : IBaseRepository<Anime, int>
 {

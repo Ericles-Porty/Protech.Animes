@@ -1,4 +1,4 @@
-namespace Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
+namespace Protech.Animes.Domain.Interfaces.Repositories;
 
 public interface IBaseRepository<TEntity, TPrimaryKey> where TEntity : class where TPrimaryKey : struct
 {

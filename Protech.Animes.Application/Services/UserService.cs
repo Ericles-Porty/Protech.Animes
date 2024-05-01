@@ -1,6 +1,6 @@
-using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
+using Protech.Animes.Domain.Interfaces.Repositories;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.Services;
 

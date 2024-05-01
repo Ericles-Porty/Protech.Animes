@@ -2,7 +2,8 @@ using System.Security.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
-using Protech.Animes.Application.Commands;
+using Protech.Animes.Application.CQRS.Commands.UserCommands;
+using Protech.Animes.Application.CQRS.Queries.UserQueries;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Exceptions;
 
@@ -32,13 +33,13 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
+    public async Task<IActionResult> Register(RegisterUserCommand registerUserCommand)
     {
         try
         {
             _logger.LogInformation("Register user called");
 
-            var user = await _mediator.Send(new RegisterUserCommand(registerUserDto));
+            var user = await _mediator.Send(registerUserCommand);
 
             _logger.LogInformation("User registered");
 
@@ -73,13 +74,13 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    public async Task<IActionResult> Login(LoginUserQuery loginUserQuery)
     {
         try
         {
             _logger.LogInformation("Login user called");
 
-            var user = await _mediator.Send(new LoginUserCommand(loginUserDto));
+            var user = await _mediator.Send(loginUserQuery);
 
             _logger.LogInformation("User logged in");
 

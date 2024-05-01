@@ -1,14 +1,14 @@
-using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
+// using Protech.Animes.Application.DTOs;
+// using Protech.Animes.Application.Interfaces;
 
-namespace Protech.Animes.Application.UseCases.AnimeUseCases;
+// namespace Protech.Animes.Application.UseCases.AnimeUseCases;
 
-public class GetAnimeUseCase(IAnimeService animeService)
-{
+// public class GetAnimeUseCase(IAnimeService animeService)
+// {
 
-    private readonly IAnimeService _animeService = animeService;
+//     private readonly IAnimeService _animeService = animeService;
 
-    public async Task<AnimeDto> Execute(int id) =>
-        await _animeService.GetAnime(id);
+//     public async Task<AnimeDto> Execute(int id) =>
+//         await _animeService.GetAnime(id);
 
-}
+// }

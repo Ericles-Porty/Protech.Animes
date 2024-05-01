@@ -4,8 +4,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Protech.Animes.Application.Configurations;
-using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.Services;
 
