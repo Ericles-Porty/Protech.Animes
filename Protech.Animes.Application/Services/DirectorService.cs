@@ -38,7 +38,7 @@ public class DirectorService : IDirectorService
         return await _directorRepository.GetAllAsync();
     }
 
-    public async Task<Director> UpdateDirector(int id, Director director)
+    public async Task<Director> UpdateDirector(Director director)
     {
         var updatedDirector = await _directorRepository.UpdateAsync(director);
         if (updatedDirector is null) throw new NotFoundException("Director not found");

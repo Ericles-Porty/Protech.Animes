@@ -16,7 +16,7 @@ public interface IDirectorService
 
     Task<Director> CreateDirector(Director createDirector);
 
-    Task<Director> UpdateDirector(int id, Director Director);
+    Task<Director> UpdateDirector(Director Director);
 
     Task<bool> DeleteDirector(int id);
 }

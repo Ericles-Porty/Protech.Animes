@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
+using Protech.Animes.Application.CQRS.Commands.DirectorCommands;
+using Protech.Animes.Application.CQRS.Queries;
 using Protech.Animes.Application.CQRS.Queries.DirectorQueries;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Exceptions;
@@ -37,7 +39,6 @@ public class DirectorController : ControllerBase
         try
         {
             _logger.LogInformation("GetDirectors called");
-
 
             var directors = await _mediator.Send(new GetDirectorsQuery(paginationParams));
             return Ok(directors);
@@ -132,120 +133,122 @@ public class DirectorController : ControllerBase
         }
     }
 
-    // /// <summary>
-    // /// Create a director
-    // /// </summary>
-    // [HttpPost]
-    // [ProducesResponseType(typeof(DirectorDto), 201)]
-    // [ProducesResponseType(typeof(ErrorModel), 400)]
-    // [ProducesResponseType(500)]
-    // public async Task<IActionResult> CreateDirector(CreateDirectorDto createDirectorDto)
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("CreateDirector called");
+    /// <summary>
+    /// Create a director
+    /// </summary>
+    [HttpPost]
+    [ProducesResponseType(typeof(DirectorDto), 201)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> CreateDirector(CreateDirectorCommand createDirectorCommand)
+    {
+        try
+        {
+            _logger.LogInformation("CreateDirector called");
 
-    //         var director = await _createDirectorUseCase.Execute(createDirectorDto);
+            var director = await _mediator.Send(createDirectorCommand);
 
-    //         return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
-    //     }
-    //     catch (DuplicatedEntityException ex)
-    //     {
-    //         _logger.LogWarning(ex, "Director already exists");
+            return CreatedAtAction(nameof(CreateDirector), new { id = director.Id }, director);
+        }
+        catch (DuplicatedEntityException ex)
+        {
+            _logger.LogWarning(ex, "Director already exists");
 
-    //         var error = new { message = ex.Message };
-    //         return BadRequest(error);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "An error occurred while creating the director");
+            var error = new { message = ex.Message };
+            return BadRequest(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while creating the director");
 
-    //         return StatusCode(500);
-    //     }
-    // }
+            return StatusCode(500);
+        }
+    }
 
-    // /// <summary>
-    // /// Delete a director by id
-    // /// </summary>
-    // [HttpDelete("{id}")]
-    // [ProducesResponseType(204)]
-    // [ProducesResponseType(typeof(ErrorModel), 404)]
-    // [ProducesResponseType(typeof(ErrorModel), 409)]
-    // [ProducesResponseType(500)]
-    // public async Task<IActionResult> DeleteDirector(int id)
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("DeleteDirector called");
+    /// <summary>
+    /// Delete a director by id
+    /// </summary>
+    [HttpDelete("{id:int:min(1)}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
+    [ProducesResponseType(typeof(ErrorModel), 409)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> DeleteDirector(int id)
+    {
+        try
+        {
+            _logger.LogInformation("DeleteDirector called");
 
-    //         var deleted = await _deleteDirectorUseCase.Execute(id);
+            var deleted = await _mediator.Send(new DeleteDirectorCommand(id));
+            if (deleted)
+            {
+                _logger.LogInformation("Director deleted");
 
-    //         if (deleted)
-    //         {
-    //             _logger.LogInformation("Director deleted");
+                return NoContent();
+            }
 
-    //             return NoContent();
-    //         }
+            _logger.LogWarning("Director could not be deleted");
 
-    //         _logger.LogWarning("Director could not be deleted");
+            var error = new ErrorModel { Message = "Director not found", StatusCode = 404 };
+            return NotFound(error);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Director has animes associated with it. Cannot delete.");
 
-    //         var error = new ErrorModel { Message = "Director not found", StatusCode = 404 };
-    //         return NotFound(error);
-    //     }
-    //     catch (InvalidOperationException ex)
-    //     {
-    //         _logger.LogWarning(ex, "Director has animes associated with it. Cannot delete.");
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 409 };
+            return Conflict(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while deleting the director");
 
-    //         var error = new ErrorModel { Message = ex.Message, StatusCode = 409 };
-    //         return Conflict(error);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "An error occurred while deleting the director");
+            return StatusCode(500);
+        }
+    }
 
-    //         return StatusCode(500);
-    //     }
-    // }
+    /// <summary>
+    /// Update a director by id
+    /// </summary>
+    [HttpPut("{id:int:min(1)}")]
+    [ProducesResponseType(typeof(DirectorDto), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> UpdateDirector(int id, UpdateDirectorCommand updateDirectorCommand)
+    {
+        try
+        {
+            _logger.LogInformation("UpdateDirector called");
 
-    // /// <summary>
-    // /// Update a director by id
-    // /// </summary>
-    // [HttpPut("{id}")]
-    // [ProducesResponseType(typeof(DirectorDto), 200)]
-    // [ProducesResponseType(typeof(ErrorModel), 400)]
-    // [ProducesResponseType(typeof(ErrorModel), 404)]
-    // [ProducesResponseType(500)]
-    // public async Task<IActionResult> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto)
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("UpdateDirector called");
+            if (id != updateDirectorCommand.Id)
+                throw new BadRequestException("Id does not match");
 
-    //         var director = await _updateDirectorUseCase.Execute(id, updateDirectorDto);
+            var director = await _mediator.Send(updateDirectorCommand);
 
-    //         _logger.LogInformation("Director updated");
+            _logger.LogInformation("Director updated");
 
-    //         return Ok(director);
-    //     }
-    //     catch (BadRequestException ex)
-    //     {
-    //         _logger.LogWarning(ex, "Id does not match");
+            return Ok(director);
+        }
+        catch (BadRequestException ex)
+        {
+            _logger.LogWarning(ex, "Bad request exception occurred while updating the director");
 
-    //         var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
-    //         return BadRequest(error);
-    //     }
-    //     catch (NotFoundException ex)
-    //     {
-    //         _logger.LogWarning(ex, "Director not found");
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Director not found");
 
-    //         var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
-    //         return NotFound(error);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "An error occurred while updating the director");
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 404 };
+            return NotFound(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while updating the director");
 
-    //         return StatusCode(500);
-    //     }
-    // }
+            return StatusCode(500);
+        }
+    }
 }
