@@ -19,7 +19,7 @@ public class GetDirectorsByIdHandler : IRequestHandler<GetDirectorByIdQuery, Dir
 
     public async Task<DirectorDto> Handle(GetDirectorByIdQuery request, CancellationToken cancellationToken)
     {
-        if (request.Id < 1)
+        if (request.Id <= 0)
             throw new ArgumentException("Id must be greater than 0");
 
         var director = await _directorService.GetDirector(request.Id);

@@ -65,7 +65,7 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(DirectorDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetDirector(int id)
+    public async Task<IActionResult> GetDirector([FromRoute] int id)
     {
         try
         {
@@ -106,7 +106,7 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<DirectorDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetDirectorsByName(string name, [FromQuery] PaginationParams paginationParams)
+    public async Task<IActionResult> GetDirectorsByName([FromRoute] string name, [FromQuery] PaginationParams paginationParams)
     {
         try
         {
@@ -140,7 +140,7 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(DirectorDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> CreateDirector(CreateDirectorCommand createDirectorCommand)
+    public async Task<IActionResult> CreateDirector([FromBody] CreateDirectorCommand createDirectorCommand)
     {
         try
         {
@@ -173,7 +173,7 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(typeof(ErrorModel), 409)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> DeleteDirector(int id)
+    public async Task<IActionResult> DeleteDirector([FromRoute] int id)
     {
         try
         {
@@ -215,7 +215,7 @@ public class DirectorController : ControllerBase
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> UpdateDirector(int id, UpdateDirectorCommand updateDirectorCommand)
+    public async Task<IActionResult> UpdateDirector([FromRoute] int id, [FromBody] UpdateDirectorCommand updateDirectorCommand)
     {
         try
         {
