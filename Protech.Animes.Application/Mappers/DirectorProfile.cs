@@ -11,6 +11,6 @@ public class DirectorProfile : Profile
     {
         CreateMap<Director, DirectorDto>().ReverseMap();
         CreateMap<CreateDirectorCommand, Director>().ReverseMap();
-        CreateMap<UpdateDirectorDto, Director>().ReverseMap();
+        CreateMap<UpdateDirectorCommand, Director>().ReverseMap();
     }
 }

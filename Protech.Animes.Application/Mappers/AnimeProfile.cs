@@ -12,13 +12,8 @@ public class AnimeProfile : Profile
         CreateMap<Anime, AnimeDto>()
             .ForMember(dest => dest.DirectorName, opt => opt.MapFrom(src => src.Director.Name));
 
-        CreateMap<AnimeDto, Anime>()
-            .ForMember(dest => dest.Director, opt => opt.Ignore());
-
         CreateMap<CreateAnimeCommand, Anime>()
             .ForMember(dest => dest.Director, opt => opt.Ignore());
-        CreateMap<Anime, CreateAnimeCommand>()
-            .ForMember(dest => dest.DirectorName, opt => opt.MapFrom(src => src.Director.Name));
 
         CreateMap<UpdateAnimeCommand, Anime>()
             .ForMember(dest => dest.Director, opt => opt.Ignore());

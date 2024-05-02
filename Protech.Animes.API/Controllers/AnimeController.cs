@@ -125,6 +125,20 @@ public class AnimeController : ControllerBase
             var error = new ErrorModel { Message = "Anime already exists", StatusCode = 400 };
             return BadRequest(error);
         }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while creating the anime");
+
+            var error = new ErrorModel { Message = "Director not found", StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while creating the anime");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+            return BadRequest(error);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while creating the anime");

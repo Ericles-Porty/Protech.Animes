@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using MediatR;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Validations;
 
 namespace Protech.Animes.Application.CQRS.Commands.AnimeCommands;
 
@@ -17,7 +16,7 @@ public class CreateAnimeCommand : IRequest<AnimeDto>
     [MinLength(3, ErrorMessage = "Summary is too short")]
     public required string Summary { get; set; }
 
-    [Required(ErrorMessage = "Director name is required")]
-    [HumanNamePattern]
-    public required string DirectorName { get; set; }
+    [Required(ErrorMessage = "Director id is required")]
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid director id")]
+    public required int DirectorId { get; set; }
 }
