@@ -48,7 +48,6 @@ public class AnimeService : IAnimeService
         return await _animeRepository.GetByNamePatternPaginatedAsync(name, page, pageSize);
     }
 
-
     public async Task<IEnumerable<Anime>> GetAnimes()
     {
         return await _animeRepository.GetAllAsync();
@@ -89,7 +88,7 @@ public class AnimeService : IAnimeService
         return await _animeRepository.GetAllPaginatedAsync(page, pageSize);
     }
 
-    public async Task<Anime> UpdateAnime(int id, Anime anime)
+    public async Task<Anime> UpdateAnime(Anime anime)
     {
         var updatedAnime = await _animeRepository.UpdateAsync(anime);
         if (updatedAnime is null) throw new NotFoundException("Anime not found");

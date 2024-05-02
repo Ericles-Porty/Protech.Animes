@@ -12,7 +12,7 @@ public interface IAnimeService
 
     Task<Anime> CreateAnime(Anime anime);
 
-    Task<Anime> UpdateAnime(int id, Anime anime);
+    Task<Anime> UpdateAnime(Anime anime);
 
     Task<bool> DeleteAnime(int id);
 
