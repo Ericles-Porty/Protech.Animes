@@ -1,11 +1,13 @@
 using System.Security.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Protech.Animes.API.Models;
 using Protech.Animes.Application.CQRS.Commands.UserCommands;
 using Protech.Animes.Application.CQRS.Queries.UserQueries;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Exceptions;
+using Protech.Animes.Domain.Policies;
 
 namespace Protech.Animes.API.Controllers;
 
@@ -70,6 +72,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Login a user.
     /// </summary>
+    [EnableRateLimiting(RateLimitPolicies.LoginAttempts)]
     [HttpPost("login")]
     [ProducesResponseType(typeof(UserDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
