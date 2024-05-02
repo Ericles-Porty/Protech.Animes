@@ -6,10 +6,6 @@ public interface IAnimeRepository : IBaseRepository<Anime, int>
 {
     Task<Anime?> GetByNameAsync(string name);
 
-    Task<Anime?> CreateAnimeWithDirectorAsync(Anime anime, Director director);
-
-    Task<Anime?> UpdateAnimeWithNewDirectorAsync(Anime anime, Director director);
-
     Task<Anime?> GetByIdIncludingDirectorAsync(int id);
 
     Task<IEnumerable<Anime>> GetAllPaginatedAsync(int page, int pageSize);
