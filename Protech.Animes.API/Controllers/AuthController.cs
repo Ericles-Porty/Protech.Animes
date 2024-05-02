@@ -35,7 +35,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> Register(RegisterUserCommand registerUserCommand)
+    public async Task<IActionResult> Register([FromBody] RegisterUserCommand registerUserCommand)
     {
         try
         {
@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> Login(LoginUserQuery loginUserQuery)
+    public async Task<IActionResult> Login([FromBody] LoginUserQuery loginUserQuery)
     {
         try
         {
