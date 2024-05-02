@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using MediatR;
+using Protech.Animes.Application.DTOs;
 
-namespace Protech.Animes.Application.DTOs;
+namespace Protech.Animes.Application.CQRS.Commands.AnimeCommands;
 
-public class UpdateAnimeDto
+public class UpdateAnimeCommand : IRequest<AnimeDto>
 {
     [Required(ErrorMessage = "Id is required")]
     public required int Id { get; set; }

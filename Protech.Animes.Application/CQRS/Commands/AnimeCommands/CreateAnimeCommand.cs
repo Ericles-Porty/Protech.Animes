@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using MediatR;
+using Protech.Animes.Application.DTOs;
 using Protech.Animes.Application.Validations;
 
-namespace Protech.Animes.Application.DTOs;
+namespace Protech.Animes.Application.CQRS.Commands.AnimeCommands;
 
-public class CreateAnimeDto
+public class CreateAnimeCommand : IRequest<AnimeDto>
 {
     [Required(ErrorMessage = "Name is required")]
     [StringLength(100, ErrorMessage = "Name is too long")]
