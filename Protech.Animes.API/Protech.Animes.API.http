@@ -1,4 +1,29 @@
 @Protech_Animes_API_HostAddress = http://localhost:5088
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiVXNlciIsIm5iZiI6MTcxNDU4NDUzOSwiZXhwIjoxNzE0NTkxNzM5LCJpYXQiOjE3MTQ1ODQ1MzksImlzcyI6IlByb3RlY2hBbmltZSIsImF1ZCI6IlByb3RlY2hBbmltZSJ9.S1d8K46-w1fuL49R0PMP1MK_VF7_tOwHIDV9Ebxa-vc
+
+POST {{Protech_Animes_API_HostAddress}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Ericles",
+  "email": "user@example.com",
+  "password": "string",
+  "confirmPassword": "string"
+}
+
+###
+
+POST {{Protech_Animes_API_HostAddress}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "user@example.com",
+  "password": "string"
+}
+
+###
 
 GET {{Protech_Animes_API_HostAddress}}/api/anime
 Accept: application/json
@@ -36,3 +61,9 @@ Accept: application/json
 
 DELETE {{Protech_Animes_API_HostAddress}}/api/anime/1
 Accept: application/json
+
+###
+
+GET {{Protech_Animes_API_HostAddress}}/api/director/1
+Accept: application/json
+Authorization: Bearer {{token}}

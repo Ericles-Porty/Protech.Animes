@@ -1,9 +1,7 @@
-using AutoMapper;
-using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
 using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
+using Protech.Animes.Domain.Interfaces.Repositories;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.Services;
 
@@ -11,38 +9,15 @@ public class AnimeService : IAnimeService
 {
 
     private readonly IAnimeRepository _animeRepository;
-    private readonly IMapper _mapper;
 
-    public AnimeService(IAnimeRepository animeRepository, IMapper mapper)
+    public AnimeService(IAnimeRepository animeRepository)
     {
         _animeRepository = animeRepository;
-        _mapper = mapper;
     }
 
-    public async Task<AnimeDto> CreateAnime(AnimeDto animeDto)
+    public async Task<Anime> CreateAnime(Anime anime)
     {
-        var anime = _mapper.Map<Anime>(animeDto);
-
-        var createdAnime = await _animeRepository.CreateAsync(anime);
-
-        var animeDtoCreated = _mapper.Map<AnimeDto>(createdAnime);
-
-        return animeDtoCreated;
-    }
-
-    public async Task<AnimeDto> CreateAnimeWithDirector(AnimeDto animeDto)
-    {
-        var director = new Director { Name = animeDto.DirectorName };
-
-        var anime = _mapper.Map<Anime>(animeDto);
-
-        var createdAnime = await _animeRepository.CreateAnimeWithDirectorAsync(anime, director);
-
-        if (createdAnime is null) throw new Exception("An error occurred while creating the anime");
-
-        var animeDtoCreated = _mapper.Map<AnimeDto>(createdAnime);
-
-        return animeDtoCreated;
+        return await _animeRepository.CreateAsync(anime);
     }
 
     public async Task<bool> DeleteAnime(int id)
@@ -50,144 +25,75 @@ public class AnimeService : IAnimeService
         return await _animeRepository.DeleteAsync(id);
     }
 
-    public async Task<AnimeDto> GetAnime(int id)
+    public async Task<Anime> GetAnime(int id)
     {
         var anime = await _animeRepository.GetByIdIncludingDirectorAsync(id);
-
         if (anime is null) throw new NotFoundException("Anime not found");
 
-        var animeDto = _mapper.Map<AnimeDto>(anime);
-
-        return animeDto;
+        return anime;
     }
 
-    public async Task<AnimeDto?> GetAnimeByName(string name)
+    public async Task<Anime?> GetAnimeByName(string name)
     {
-        var anime = await _animeRepository.GetByNameAsync(name);
-
-        if (anime is null) return null;
-
-        var animeDto = _mapper.Map<AnimeDto>(anime);
-
-        return animeDto;
+        return await _animeRepository.GetByNameAsync(name);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesByNamePattern(string name)
+    public async Task<IEnumerable<Anime>> GetAnimesByNamePattern(string name)
     {
-        var animes = await _animeRepository.GetByNamePatternAsync(name);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByNamePatternAsync(name);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesByNamePatternPaginated(string name, int page, int pageSize)
+    public async Task<IEnumerable<Anime>> GetAnimesByNamePatternPaginated(string name, int page, int pageSize)
     {
-        var animes = await _animeRepository.GetByNamePatternPaginatedAsync(name, page, pageSize);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByNamePatternPaginatedAsync(name, page, pageSize);
     }
 
-
-    public async Task<IEnumerable<AnimeDto>> GetAnimes()
+    public async Task<IEnumerable<Anime>> GetAnimes()
     {
-        var animes = await _animeRepository.GetAllAsync();
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetAllAsync();
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesByDirector(int directorId)
+    public async Task<IEnumerable<Anime>> GetAnimesByDirector(int directorId)
     {
-        var animes = await _animeRepository.GetByDirectorIdAsync(directorId);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByDirectorIdAsync(directorId);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesByDirectorPaginated(int directorId, int page, int pageSize)
+    public async Task<IEnumerable<Anime>> GetAnimesByDirectorPaginated(int directorId, int page, int pageSize)
     {
-        var animes = await _animeRepository.GetByDirectorIdPaginatedAsync(directorId, page, pageSize);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByDirectorIdPaginatedAsync(directorId, page, pageSize);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesByDirectorName(string directorName)
+    public async Task<IEnumerable<Anime>> GetAnimesByDirectorName(string directorName)
     {
-        var animes = await _animeRepository.GetByDirectorNameAsync(directorName);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByDirectorNameAsync(directorName);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesByDirectorNamePaginated(string directorName, int page, int pageSize)
+    public async Task<IEnumerable<Anime>> GetAnimesByDirectorNamePaginated(string directorName, int page, int pageSize)
     {
-        var animes = await _animeRepository.GetByDirectorNamePaginatedAsync(directorName, page, pageSize);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByDirectorNamePaginatedAsync(directorName, page, pageSize);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesBySummaryKeyword(string keyword)
+    public async Task<IEnumerable<Anime>> GetAnimesBySummaryKeyword(string keyword)
     {
-        var animes = await _animeRepository.GetByKeywordSummaryAsync(keyword);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByKeywordSummaryAsync(keyword);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesBySummaryKeywordPaginated(string keyword, int page, int pageSize)
+    public async Task<IEnumerable<Anime>> GetAnimesBySummaryKeywordPaginated(string keyword, int page, int pageSize)
     {
-        var animes = await _animeRepository.GetByKeywordSummaryPaginatedAsync(keyword, page, pageSize);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetByKeywordSummaryPaginatedAsync(keyword, page, pageSize);
     }
 
-    public async Task<IEnumerable<AnimeDto>> GetAnimesPaginated(int page, int pageSize)
+    public async Task<IEnumerable<Anime>> GetAnimesPaginated(int page, int pageSize)
     {
-        var animes = await _animeRepository.GetAllPaginatedAsync(page, pageSize);
-
-        var animesDto = _mapper.Map<IEnumerable<AnimeDto>>(animes);
-
-        return animesDto;
+        return await _animeRepository.GetAllPaginatedAsync(page, pageSize);
     }
 
-    public async Task<AnimeDto> UpdateAnime(int id, AnimeDto animeDto)
+    public async Task<Anime> UpdateAnime(Anime anime)
     {
-        var anime = _mapper.Map<Anime>(animeDto);
-
-        var updatedAnime = await _animeRepository.UpdateAsync(id, anime);
-
+        var updatedAnime = await _animeRepository.UpdateAsync(anime);
         if (updatedAnime is null) throw new NotFoundException("Anime not found");
 
-        var animeDtoUpdated = _mapper.Map<AnimeDto>(updatedAnime);
-
-        return animeDtoUpdated;
+        return updatedAnime;
     }
 
-    public async Task<AnimeDto> UpdateAnimeWithNewDirector(AnimeDto animeDto)
-    {
-        var director = new Director { Name = animeDto.DirectorName };
-
-        var anime = _mapper.Map<Anime>(animeDto);
-
-        var updatedAnime = await _animeRepository.UpdateAnimeWithNewDirectorAsync(anime, director);
-
-        if (updatedAnime is null) throw new NotFoundException("Anime not found");
-
-        var animeDtoUpdated = _mapper.Map<AnimeDto>(updatedAnime);
-
-        return animeDtoUpdated;
-    }
 }

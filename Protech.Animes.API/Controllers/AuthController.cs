@@ -1,9 +1,13 @@
 using System.Security.Authentication;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Protech.Animes.API.Models;
+using Protech.Animes.Application.CQRS.Commands.UserCommands;
+using Protech.Animes.Application.CQRS.Queries.UserQueries;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.UseCases.AuthUseCases;
 using Protech.Animes.Domain.Exceptions;
+using Protech.Animes.Domain.Policies;
 
 namespace Protech.Animes.API.Controllers;
 
@@ -11,21 +15,17 @@ namespace Protech.Animes.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-
-    private readonly RegisterUserUseCase _registerUserUseCase;
-    private readonly LoginUserUseCase _loginUserUseCase;
     private readonly ILogger<AuthController> _logger;
+    private readonly IMediator _mediator;
 
 
     public AuthController(
-        RegisterUserUseCase RegisterUserUseCase,
-        LoginUserUseCase LoginUserUseCase,
-        ILogger<AuthController> logger
+        ILogger<AuthController> logger,
+        IMediator mediator
         )
     {
-        _registerUserUseCase = RegisterUserUseCase;
-        _loginUserUseCase = LoginUserUseCase;
         _logger = logger;
+        _mediator = mediator;
     }
 
     /// <summary>
@@ -35,13 +35,13 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
+    public async Task<IActionResult> Register([FromBody] RegisterUserCommand registerUserCommand)
     {
         try
         {
             _logger.LogInformation("Register user called");
 
-            var user = await _registerUserUseCase.Execute(registerUserDto);
+            var user = await _mediator.Send(registerUserCommand);
 
             _logger.LogInformation("User registered");
 
@@ -52,6 +52,13 @@ public class AuthController : ControllerBase
             _logger.LogWarning(ex, "Bad request");
 
             var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (DuplicatedEntityException)
+        {
+            _logger.LogWarning("Duplicated entity");
+
+            var error = new ErrorModel { Message = "User already exists", StatusCode = 400 };
             return BadRequest(error);
         }
         catch (Exception ex)
@@ -65,21 +72,22 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Login a user.
     /// </summary>
+    [EnableRateLimiting(RateLimitPolicies.LoginAttempts)]
     [HttpPost("login")]
     [ProducesResponseType(typeof(UserDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    public async Task<IActionResult> Login([FromBody] LoginUserQuery loginUserQuery)
     {
         try
         {
             _logger.LogInformation("Login user called");
 
-            var userWithToken = await _loginUserUseCase.Execute(loginUserDto.Email, loginUserDto.Password);
+            var user = await _mediator.Send(loginUserQuery);
 
             _logger.LogInformation("User logged in");
 
-            return Ok(userWithToken);
+            return Ok(user);
         }
         catch (InvalidCredentialException ex)
         {

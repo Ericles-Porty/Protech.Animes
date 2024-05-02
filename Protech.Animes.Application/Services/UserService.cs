@@ -1,6 +1,6 @@
-using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
+using Protech.Animes.Domain.Interfaces.Repositories;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.Services;
 
@@ -18,7 +18,7 @@ public class UserService : IUserService
         return await _userRepository.CreateAsync(user);
     }
 
-    public async Task<User?> GetUserByEmail(string email)
+    public async Task<User?> GetByEmail(string email)
     {
         return await _userRepository.GetByEmailAsync(email);
     }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Protech.Animes.Application.CQRS.Commands.DirectorCommands;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Entities;
 
@@ -9,10 +10,7 @@ public class DirectorProfile : Profile
     public DirectorProfile()
     {
         CreateMap<Director, DirectorDto>().ReverseMap();
-
-        CreateMap<UpdateDirectorDto, Director>().ReverseMap();
-
-        CreateMap<CreateDirectorDto, Director>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<CreateDirectorCommand, Director>().ReverseMap();
+        CreateMap<UpdateDirectorCommand, Director>().ReverseMap();
     }
 }

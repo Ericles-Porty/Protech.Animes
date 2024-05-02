@@ -1,4 +1,5 @@
 using AutoMapper;
+using Protech.Animes.Application.CQRS.Commands.AnimeCommands;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Entities;
 
@@ -8,20 +9,14 @@ public class AnimeProfile : Profile
 {
     public AnimeProfile()
     {
-        // dest = destination, opt = options, src = source
         CreateMap<Anime, AnimeDto>()
             .ForMember(dest => dest.DirectorName, opt => opt.MapFrom(src => src.Director.Name));
 
-        CreateMap<AnimeDto, Anime>()
+        CreateMap<CreateAnimeCommand, Anime>()
             .ForMember(dest => dest.Director, opt => opt.Ignore());
 
-        CreateMap<CreateAnimeDto, Anime>()
+        CreateMap<UpdateAnimeCommand, Anime>()
             .ForMember(dest => dest.Director, opt => opt.Ignore());
-
-        CreateMap<Anime, CreateAnimeDto>()
-            .ForMember(dest => dest.DirectorName, opt => opt.MapFrom(src => src.Director.Name));
-
-        CreateMap<CreateAnimeDto, AnimeDto>().ReverseMap();
-
+            
     }
 }

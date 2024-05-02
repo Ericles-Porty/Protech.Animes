@@ -1,32 +1,23 @@
-using AutoMapper;
-using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
-using Protech.Animes.Infrastructure.Data.Repositories.Interfaces;
+using Protech.Animes.Domain.Interfaces.Repositories;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.Application.Services;
 
 public class DirectorService : IDirectorService
 {
     private readonly IDirectorRepository _directorRepository;
-    private readonly IMapper _mapper;
 
-    public DirectorService(IDirectorRepository directorRepository, IMapper mapper)
+    public DirectorService(IDirectorRepository directorRepository)
     {
         _directorRepository = directorRepository;
-        _mapper = mapper;
     }
 
-    public async Task<DirectorDto> CreateDirector(CreateDirectorDto createDirectorDto)
+    public async Task<Director> CreateDirector(Director director)
     {
-        var director = _mapper.Map<Director>(createDirectorDto);
-
         var createdDirector = await _directorRepository.CreateAsync(director);
-
-        var directorDto = _mapper.Map<DirectorDto>(createdDirector);
-
-        return directorDto;
+        return createdDirector;
     }
 
     public async Task<bool> DeleteDirector(int id)
@@ -34,68 +25,48 @@ public class DirectorService : IDirectorService
         return await _directorRepository.DeleteAsync(id);
     }
 
-    public async Task<DirectorDto> GetDirector(int id)
+    public async Task<Director> GetDirector(int id)
     {
         var director = await _directorRepository.GetByIdAsync(id);
         if (director is null) throw new NotFoundException("Director not found");
 
-        var directorDto = _mapper.Map<DirectorDto>(director);
-
-        return directorDto;
+        return director;
     }
 
-    public async Task<IEnumerable<DirectorDto>> GetDirectors()
+    public async Task<IEnumerable<Director>> GetDirectors()
     {
-        var directors = await _directorRepository.GetAllAsync();
-        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
-
-        return directorsDto;
+        return await _directorRepository.GetAllAsync();
     }
 
-    public async Task<DirectorDto> UpdateDirector(int id, UpdateDirectorDto updateDirectorDto)
+    public async Task<Director> UpdateDirector(Director director)
     {
-        var director = _mapper.Map<Director>(updateDirectorDto);
-
-        var updatedDirector = await _directorRepository.UpdateAsync(id, director);
+        var updatedDirector = await _directorRepository.UpdateAsync(director);
         if (updatedDirector is null) throw new NotFoundException("Director not found");
 
-        var directorDtoUpdated = _mapper.Map<DirectorDto>(updatedDirector);
-
-        return directorDtoUpdated;
+        return updatedDirector;
     }
 
-    public async Task<DirectorDto?> GetDirectorByName(string name)
+    public async Task<Director?> GetDirectorByName(string name)
     {
         var director = await _directorRepository.GetByNameAsync(name);
         if (director is null) return null;
 
-        var directorDto = _mapper.Map<DirectorDto>(director);
-
-        return directorDto;
+        return director;
     }
 
-    public async Task<IEnumerable<DirectorDto>> GetDirectorsByNamePattern(string name)
+    public async Task<IEnumerable<Director>> GetDirectorsByNamePattern(string name)
     {
-        var directors = await _directorRepository.GetByNamePatternAsync(name);
-        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
-
-        return directorsDto;
+        return await _directorRepository.GetByNamePatternAsync(name);
     }
 
-    public async Task<IEnumerable<DirectorDto>> GetDirectorsPaginated(int page, int pageSize)
+    public async Task<IEnumerable<Director>> GetDirectorsPaginated(int page, int pageSize)
     {
-        var directors = await _directorRepository.GetAllPaginatedAsync(page, pageSize);
-        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
-
-        return directorsDto;
+        return await _directorRepository.GetAllPaginatedAsync(page, pageSize);
     }
 
-    public async Task<IEnumerable<DirectorDto>> GetDirectorsByNamePatternPaginated(string name, int page, int pageSize)
+    public async Task<IEnumerable<Director>> GetDirectorsByNamePatternPaginated(string name, int page, int pageSize)
     {
-        var directors = await _directorRepository.GetByNamePatternPaginatedAsync(name, page, pageSize);
-        var directorsDto = _mapper.Map<IEnumerable<DirectorDto>>(directors);
-
-        return directorsDto;
+        return await _directorRepository.GetByNamePatternPaginatedAsync(name, page, pageSize);
     }
 }
 

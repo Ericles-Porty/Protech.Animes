@@ -1,5 +1,5 @@
-using Protech.Animes.Application.Interfaces;
 using Protech.Animes.Application.Services;
+using Protech.Animes.Domain.Interfaces.Services;
 
 namespace Protech.Animes.API.Extensions.DependencyInjection;
 public static class ServicesDependenciesInjectionExtension

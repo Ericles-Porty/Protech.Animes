@@ -1,9 +1,11 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Protech.Animes.API.Models;
+using Protech.Animes.Application.CQRS.Commands.AnimeCommands;
+using Protech.Animes.Application.CQRS.Queries;
+using Protech.Animes.Application.CQRS.Queries.AnimesQueries;
 using Protech.Animes.Application.DTOs;
-using Protech.Animes.Application.Interfaces;
-using Protech.Animes.Application.UseCases.AnimeUseCases;
 using Protech.Animes.Domain.Exceptions;
 
 namespace Protech.Animes.API.Controllers;
@@ -14,39 +16,15 @@ namespace Protech.Animes.API.Controllers;
 public class AnimeController : ControllerBase
 {
     private readonly ILogger<AnimeController> _logger;
-    private readonly CreateAnimeUseCase _createAnimeUseCase;
-    private readonly UpdateAnimeUseCase _updateAnimeUseCase;
-    private readonly GetAnimesUseCase _getAnimesUseCase;
-    private readonly GetAnimeUseCase _getAnimeUsecase;
-    private readonly DeleteAnimeUseCase _deleteAnimeUseCase;
-    private readonly GetAnimesByNameUseCase _getAnimesByNameUseCase;
-    private readonly GetAnimesByDirectorUseCase _getAnimesByDirectorUseCase;
-    private readonly GetAnimesByDirectorNameUseCase _getAnimesByDirectorNameUseCase;
-    private readonly GetAnimesBySummaryKeywordUseCase _getAnimesBySummaryKeywordUseCase;
+    private readonly IMediator _mediator;
 
     public AnimeController(
         ILogger<AnimeController> logger,
-        CreateAnimeUseCase createAnimeUseCase,
-        UpdateAnimeUseCase updateAnimeUseCase,
-        GetAnimesUseCase getAnimesUseCase,
-        GetAnimeUseCase getAnimeUsecase,
-        DeleteAnimeUseCase deleteAnimeUseCase,
-        GetAnimesByNameUseCase getAnimesByNameUseCase,
-        GetAnimesByDirectorUseCase getAnimesByDirectorUseCase,
-        GetAnimesByDirectorNameUseCase getAnimesByDirectorNameUseCase,
-        GetAnimesBySummaryKeywordUseCase getAnimesBySummaryKeywordUseCase
+        IMediator mediator
         )
     {
         _logger = logger;
-        _createAnimeUseCase = createAnimeUseCase;
-        _updateAnimeUseCase = updateAnimeUseCase;
-        _getAnimesUseCase = getAnimesUseCase;
-        _getAnimeUsecase = getAnimeUsecase;
-        _deleteAnimeUseCase = deleteAnimeUseCase;
-        _getAnimesByNameUseCase = getAnimesByNameUseCase;
-        _getAnimesByDirectorUseCase = getAnimesByDirectorUseCase;
-        _getAnimesByDirectorNameUseCase = getAnimesByDirectorNameUseCase;
-        _getAnimesBySummaryKeywordUseCase = getAnimesBySummaryKeywordUseCase;
+        _mediator = mediator;
     }
 
     /// <summary>
@@ -56,13 +34,13 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetAnimes([FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAnimes([FromQuery] PaginationParams paginationParams)
     {
         try
         {
             _logger.LogInformation("GetAnimes called");
 
-            var animes = await _getAnimesUseCase.Execute(page, pageSize);
+            var animes = await _mediator.Send(new GetAnimesQuery(paginationParams));
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -83,23 +61,28 @@ public class AnimeController : ControllerBase
     /// <summary>
     /// Get an anime by id
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int:min(1)}")]
     [ProducesResponseType(typeof(AnimeDto), 200)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetAnime(int id)
+    public async Task<IActionResult> GetAnime([FromRoute] int id)
     {
         try
         {
             _logger.LogInformation("GetAnime called");
 
-            var anime = await _getAnimeUsecase.Execute(id);
+            var anime = await _mediator.Send(new GetAnimeByIdQuery(id));
 
             _logger.LogInformation("Anime found");
 
             return Ok(anime);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while getting the anime");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+            return BadRequest(error);
         }
         catch (NotFoundException ex)
         {
@@ -123,13 +106,13 @@ public class AnimeController : ControllerBase
     [ProducesResponseType(typeof(AnimeDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> CreateAnime(CreateAnimeDto animeDto)
+    public async Task<IActionResult> CreateAnime([FromBody] CreateAnimeCommand createAnimeCommand)
     {
         try
         {
             _logger.LogInformation("CreateAnime called");
 
-            var createdAnime = await _createAnimeUseCase.Execute(animeDto);
+            var createdAnime = await _mediator.Send(createAnimeCommand);
 
             _logger.LogInformation("Anime created");
 
@@ -140,6 +123,20 @@ public class AnimeController : ControllerBase
             _logger.LogWarning(ex, "An error occurred while creating the anime");
 
             var error = new ErrorModel { Message = "Anime already exists", StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while creating the anime");
+
+            var error = new ErrorModel { Message = "Director not found", StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "An error occurred while creating the anime");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
             return BadRequest(error);
         }
         catch (Exception ex)
@@ -153,18 +150,21 @@ public class AnimeController : ControllerBase
     /// <summary>
     /// Update an anime
     /// </summary>
-    [HttpPut("{id}")]
-    [ProducesResponseType(typeof(UpdateAnimeDto), 200)]
+    [HttpPut("{id:int:min(1)}")]
+    [ProducesResponseType(typeof(UpdateAnimeCommand), 200)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> UpdateAnime(int id, UpdateAnimeDto updateAnimeDto)
+    public async Task<IActionResult> UpdateAnime([FromRoute] int id, [FromBody] UpdateAnimeCommand updateAnimeCommand)
     {
         try
         {
             _logger.LogInformation("UpdateAnime called");
 
-            var updatedAnime = await _updateAnimeUseCase.Execute(id, updateAnimeDto);
+            if (id != updateAnimeCommand.Id)
+                throw new BadRequestException("Id in the body does not match the id in the route");
+
+            var updatedAnime = await _mediator.Send(updateAnimeCommand);
 
             _logger.LogInformation("Anime updated");
 
@@ -202,17 +202,17 @@ public class AnimeController : ControllerBase
     /// <summary>
     /// Delete an anime by id
     /// </summary>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int:min(1)}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> DeleteAnime(int id)
+    public async Task<IActionResult> DeleteAnime([FromRoute] int id)
     {
         try
         {
             _logger.LogInformation("DeleteAnime called");
 
-            var deleted = await _deleteAnimeUseCase.Execute(id);
+            var deleted = await _mediator.Send(new DeleteAnimeCommand(id));
             if (deleted is true)
             {
                 _logger.LogInformation("Anime deleted");
@@ -245,14 +245,15 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetAnimesByName(string name, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAnimesByName([FromRoute] string name, [FromQuery] PaginationParams paginationParams)
     {
         try
         {
             _logger.LogInformation("GetAnimesByName called");
 
-            var animes = await _getAnimesByNameUseCase.Execute(name, page, pageSize);
+            var animes = await _mediator.Send(new GetAnimesByNameQuery(name, paginationParams));
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -273,16 +274,17 @@ public class AnimeController : ControllerBase
     /// <summary>
     /// Get animes by director id
     /// </summary>
-    [HttpGet("director/{directorId}")]
+    [HttpGet("director/{directorId:int:min(1)}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetAnimesByDirector(int directorId, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAnimesByDirector([FromRoute] int directorId, [FromQuery] PaginationParams paginationParams)
     {
         try
         {
             _logger.LogInformation("GetAnimesByDirector called");
 
-            var animes = await _getAnimesByDirectorUseCase.Execute(directorId, page, pageSize);
+            var animes = await _mediator.Send(new GetAnimesByDirectorIdQuery(directorId, paginationParams));
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -305,14 +307,15 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("director/name/{directorName}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetAnimesByDirectorName(string directorName, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAnimesByDirectorName([FromRoute] string directorName, [FromQuery] PaginationParams paginationParams)
     {
         try
         {
             _logger.LogInformation("GetAnimesByDirectorName called");
 
-            var animes = await _getAnimesByDirectorNameUseCase.Execute(directorName, page, pageSize);
+            var animes = await _mediator.Send(new GetAnimesByDirectorNameQuery(directorName, paginationParams));
             return Ok(animes);
         }
         catch (ArgumentException ex)
@@ -335,14 +338,15 @@ public class AnimeController : ControllerBase
     /// </summary>
     [HttpGet("summary/{keyword}")]
     [ProducesResponseType(typeof(IEnumerable<AnimeDto>), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
     [ProducesResponseType(500)]
-    public async Task<IActionResult> GetAnimesBySummaryKeyword(string keyword, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAnimesBySummaryKeyword([FromRoute] string keyword, [FromQuery] PaginationParams paginationParams)
     {
         try
         {
             _logger.LogInformation("GetAnimesBySummaryKeyword called");
 
-            var animes = await _getAnimesBySummaryKeywordUseCase.ExecuteAsync(keyword, page, pageSize);
+            var animes = await _mediator.Send(new GetAnimesBySummaryKeywordQuery(keyword, paginationParams));
             return Ok(animes);
         }
         catch (ArgumentException ex)
