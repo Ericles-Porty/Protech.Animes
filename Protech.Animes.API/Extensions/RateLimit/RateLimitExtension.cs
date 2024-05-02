@@ -20,7 +20,7 @@ public static class RateLimitExtension
                         factory: (key) => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 10,
-                            Window = TimeSpan.FromSeconds(10)
+                            Window = TimeSpan.FromMinutes(10)
                         }
                     )
                 );
