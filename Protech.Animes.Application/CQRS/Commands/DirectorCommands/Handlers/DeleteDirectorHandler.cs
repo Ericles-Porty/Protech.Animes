@@ -15,7 +15,7 @@ public class DeleteDirectorHandler : IRequestHandler<DeleteDirectorCommand, bool
 
     public async Task<bool> Handle(DeleteDirectorCommand request, CancellationToken cancellationToken)
     {
-        if (request.Id < 1)
+        if (request.Id <= 0)
             throw new ArgumentException("Id must be greater than 0");
 
         var director = await _directorService.GetDirector(request.Id);
