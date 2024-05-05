@@ -1,8 +1,7 @@
-using Protech.Animes.Domain.Entities;
-
 namespace Protech.Animes.Domain.Interfaces.Services;
 
 public interface IJwtTokenService
 {
-    string GenerateToken(User user);
+    Task<string> GenerateToken(string email);
+    Task<string> GenerateRefreshToken(string email);
 }

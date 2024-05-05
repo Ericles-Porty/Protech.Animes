@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Entities;
 using Protech.Animes.Domain.Exceptions;
@@ -11,12 +13,15 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ICryptographyService _cryptographyService;
+    private readonly UserManager<IdentityUser> _userManager;
 
-    public RegisterUserHandler(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService)
+    public RegisterUserHandler(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService,
+        UserManager<IdentityUser> userManager)
     {
         _userService = userService;
         _jwtTokenService = jwtTokenService;
         _cryptographyService = cryptographyService;
+        _userManager = userManager;
     }
 
     public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -26,23 +31,29 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
         var userExists = await _userService.GetByEmail(request.Email);
         if (userExists is not null) throw new DuplicatedEntityException("User already exists");
 
-        var hashedPassword = _cryptographyService.Encrypt(request.Password);
-        var hashedPasswordBytes = System.Text.Encoding.UTF8.GetBytes(hashedPassword);
         var user = new User
         {
-            Id = Guid.NewGuid(),
-            Name = request.Name,
+            UserName = request.Name,
             Email = request.Email,
-            Password = hashedPasswordBytes
+            Password = request.Password
         };
 
-        var createdUser = await _userService.Register(user);
-        var jwtToken = _jwtTokenService.GenerateToken(createdUser);
+
+
+        var result = await _userService.Register(user);
+        if (!result) throw new BadRequestException("Failed to create user");
+
+        var createdUser = await _userService.GetByEmail(request.Email);
+        if (createdUser is null) throw new NotFoundException("User not found");
+         
+        var jwtToken = await _jwtTokenService.GenerateToken(createdUser.Email);
+        var refreshToken = await _jwtTokenService.GenerateRefreshToken(createdUser.Email);
         var userDto = new UserDto
         {
-            Name = createdUser.Name,
+            Name = createdUser.UserName,
             Email = createdUser.Email,
-            Token = jwtToken
+            Token = jwtToken,
+            RefreshToken = refreshToken
         };
 
         return userDto;

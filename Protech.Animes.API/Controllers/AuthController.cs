@@ -1,5 +1,6 @@
 using System.Security.Authentication;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Protech.Animes.API.Models;
@@ -10,6 +11,7 @@ using Protech.Animes.Domain.Exceptions;
 using Protech.Animes.Domain.Policies;
 
 namespace Protech.Animes.API.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -31,6 +33,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Register a new user.
     /// </summary>
+    [AllowAnonymous]
     [HttpPost("register")]
     [ProducesResponseType(typeof(UserDto), 201)]
     [ProducesResponseType(typeof(ErrorModel), 400)]
@@ -72,6 +75,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Login a user.
     /// </summary>
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.LoginAttempts)]
     [HttpPost("login")]
     [ProducesResponseType(typeof(UserDto), 200)]
@@ -99,6 +103,41 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while logging in the user");
+
+            return StatusCode(500);
+        }
+    }
+
+    /// <summary>
+    /// Refresh a user token.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpPost("refresh")]
+    [ProducesResponseType(typeof(UserDto), 200)]
+    [ProducesResponseType(typeof(ErrorModel), 400)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenCommand refreshTokenCommand)
+    {
+        try
+        {
+            _logger.LogInformation("Refresh token called");
+
+            var user = await _mediator.Send(refreshTokenCommand);
+
+            _logger.LogInformation("Token refreshed");
+
+            return Ok(user);
+        }
+        catch (InvalidCredentialException ex)
+        {
+            _logger.LogWarning(ex, "Invalid credentials");
+
+            var error = new ErrorModel { Message = ex.Message, StatusCode = 400 };
+            return BadRequest(error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while refreshing the token");
 
             return StatusCode(500);
         }
