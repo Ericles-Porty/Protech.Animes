@@ -9,7 +9,6 @@ namespace Protech.Animes.Application.CQRS.Commands.UserCommands;
 public class RegisterUserCommand : IRequest<UserDto>
 {
     [Required(ErrorMessage = "The Name is required")]
-    [HumanNamePattern]
     [DefaultValue("Ericles")]
     public required string Name { get; set; }
 

@@ -6,6 +6,6 @@ public class Director
 
     public required string Name { get; set; }
 
-    public List<Anime> Animes { get; set; } = new();
+    public List<Anime>? Animes { get; set; }
 
 }

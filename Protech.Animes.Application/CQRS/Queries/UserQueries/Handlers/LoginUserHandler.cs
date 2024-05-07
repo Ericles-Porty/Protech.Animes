@@ -2,40 +2,45 @@ using MediatR;
 using System.Security.Authentication;
 using Protech.Animes.Application.DTOs;
 using Protech.Animes.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace Protech.Animes.Application.CQRS.Queries.UserQueries.Handlers;
 
 public class LoginUserHandler : IRequestHandler<LoginUserQuery, UserDto>
 {
-    private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
-    private readonly ICryptographyService _cryptographyService;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    public LoginUserHandler(IUserService userService, IJwtTokenService jwtTokenService, ICryptographyService cryptographyService)
+    public LoginUserHandler(
+        IJwtTokenService jwtTokenService,
+        UserManager<IdentityUser> userManager,
+        SignInManager<IdentityUser> signInManager
+        )
     {
-        _userService = userService;
         _jwtTokenService = jwtTokenService;
-        _cryptographyService = cryptographyService;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public async Task<UserDto> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
-        var user = await _userService.GetByEmail(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null) throw new InvalidCredentialException("Invalid credentials.");
 
-        var userPassword = System.Text.Encoding.UTF8.GetString(user.Password);
-        var isValidPassword = _cryptographyService.Validate(request.Password, userPassword);
-        if (!isValidPassword) throw new InvalidCredentialException("Invalid credentials.");
+        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password,  false);
+        if (result.IsLockedOut) throw new InvalidCredentialException("Account is locked.");
+        if (!result.Succeeded) throw new InvalidCredentialException("Invalid credentials.");
 
-        var jwtToken = _jwtTokenService.GenerateToken(user);
+        var jwtToken = await _jwtTokenService.GenerateToken(user.Email!);
+        var refreshToken = await _jwtTokenService.GenerateRefreshToken(user.Email!);
         var userDto = new UserDto
         {
-            Name = user.Name,
-            Email = user.Email,
-            Token = jwtToken
+            Name = user.UserName!,
+            Email = user.Email!,
+            Token = jwtToken,
+            RefreshToken = refreshToken
         };
-
         return userDto;
     }
-
 }

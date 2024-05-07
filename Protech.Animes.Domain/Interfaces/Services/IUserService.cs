@@ -4,6 +4,6 @@ namespace Protech.Animes.Domain.Interfaces.Services;
 
 public interface IUserService
 {
-    Task<User> Register(User user);
+    Task<bool> Register(User user);
     Task<User?> GetByEmail(string email);
 }

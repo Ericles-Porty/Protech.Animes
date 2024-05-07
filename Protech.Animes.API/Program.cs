@@ -3,14 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using Protech.Animes.API.Extensions.DependencyInjection;
 using Protech.Animes.API.Extensions.Auth.JWT;
 using Protech.Animes.API.Extensions.Swagger;
-
 using Protech.Animes.API.Extensions.RateLimit;
+using Protech.Animes.API.Extensions.Auth.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ProtechAnimeDbConnection");
 
 #region Services
 builder.Services.AddDbContext<ProtechAnimesDbContext>(options => options.UseNpgsql(connectionString));
+
+builder.Services.AddIdentityExtension();
 
 builder.Services.AddRepositoryDependencies();
 builder.Services.AddServicesDependencies();

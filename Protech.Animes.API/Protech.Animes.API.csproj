@@ -5,13 +5,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>CS1591</NoWarn> <!-- Disable warning for missing XML documentation -->
+    <NoWarn>CS1591</NoWarn>    <!-- Disable warning for missing XML documentation -->
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Protech.Animes.Application\Protech.Animes.Application.csproj"/>
   </ItemGroup>

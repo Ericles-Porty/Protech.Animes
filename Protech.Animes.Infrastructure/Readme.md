@@ -1,25 +1,25 @@
 Para criar uma migração após alterar as entidades, execute o comando abaixo:
 
 ```bash
-dotnet ef migrations add NomeDaMigração -c ProtechAnimesDbContext -o .\Data\Migrations\
+dotnet ef migrations add NomeDaMigração -c ProtechAnimesDbContext -o .\Data\Migrations\ -s ..\Protech.Animes.Api\
 ```
 
 Para atualizar o banco de dados com as migrações, execute o comando abaixo:
 
 ```bash
-dotnet ef database update -c ProtechAnimesDbContext
+dotnet ef database update -c ProtechAnimesDbContext -s ..\Protech.Animes.Api\
 ```
 
 Para reverter a última migração, execute o comando abaixo:
 
 ```bash
-dotnet ef migrations remove -c ProtechAnimesDbContext
+dotnet ef migrations remove -c ProtechAnimesDbContext -s ..\Protech.Animes.Api\
 ```
 
 Para reverter todas as migrações, execute o comando abaixo:
 
 ```bash
-dotnet ef database update 0 -c ProtechAnimesDbContext
+dotnet ef database update 0 -c ProtechAnimesDbContext -s ..\Protech.Animes.Api\
 ```
 
 Para adicionar um novo contexto, execute o comando abaixo:
